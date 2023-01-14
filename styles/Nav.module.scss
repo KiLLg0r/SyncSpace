@@ -1,0 +1,68 @@
+.nav {
+  height: 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3rem;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .center {
+    .search {
+      display: flex;
+      align-items: center;
+
+      input {
+        background-color: #3b414d;
+        border: none;
+        border-radius: 2.5rem 0 0 2.5rem;
+        height: 2.5rem;
+        width: 25rem;
+
+        &::placeholder {
+          text-indent: 1rem;
+          font-size: 1.125rem;
+          color: #ffffff90;
+        }
+      }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        font-size: 1.5rem;
+        height: 2.5rem;
+        width: 3rem;
+        border-radius: 0 2.5rem 2.5rem 0;
+        background-color: #282c34;
+      }
+    }
+  }
+
+  .right {
+    button {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: none;
+      background: #282c34;
+      padding: 0.25rem 0.5rem;
+      padding-left: 0.75rem;
+      border-radius: 2rem;
+
+      .user-name {
+        font-size: 1.5rem;
+      }
+
+      img {
+        display: block;
+        height: 3rem;
+      }
+    }
+  }
+}

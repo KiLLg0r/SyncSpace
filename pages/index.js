@@ -1,14 +1,7 @@
-import Editor from "@monaco-editor/react";
-import React from "react";
+import Layout from "../components/layout";
 
 const Home = () => {
-  const [postBody, setPostBody] = React.useState("");
-
-  return (
-    <div>
-      <Editor height="90vh" language="javascript" theme="vs-dark" value={postBody} onChange={setPostBody} />
-    </div>
-  );
+  return <Layout>ceva</Layout>;
 };
 
 export default Home;
