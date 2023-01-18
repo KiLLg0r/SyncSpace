@@ -7,7 +7,7 @@ const Navigation = () => {
     <nav className={styles.nav}>
       <div className={styles.left}>
         <RiSpaceShipLine />
-        <div className={styles.name}>SyncSpace</div>
+        <div className={styles.name}><span>Sync</span>Space</div>
       </div>
       <div className={styles.center}>
         <div className={styles.search}>
