@@ -52,7 +52,7 @@ const Home = () => {
   return (
     <div>
       <Editor
-        height="100vh"
+        height="99vh"
         language="javascript"
         theme="vs-dark"
         value={code}
