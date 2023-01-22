@@ -20,7 +20,7 @@ const Navigation = () => {
       <div className={styles.right}>
         <button>
           <div className={styles["user-name"]}>User</div>
-          // eslint-disable-next-line no-use-before-define
+          {// eslint-disable-next-line no-use-before-define}
           <img src="/user.png" alt="user" />
         </button>
       </div>
