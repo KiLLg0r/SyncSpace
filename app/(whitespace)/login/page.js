@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from '../styles/Login.module.scss'
+import styles from './Login.module.scss'
 import { HiOutlineMail } from "react-icons/hi";
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiLock } from "react-icons/bi";
