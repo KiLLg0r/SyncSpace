@@ -22,7 +22,7 @@ import styles from "./Editor.module.scss";
 import { BsFolderFill, BsBoxArrowLeft, BsFileCodeFill, BsFiles } from "react-icons/bs";
 
 // Components
-import File from "../../components/File/File";
+import File from "../../components/File/file";
 
 let ydocument = new Y.Doc();
 let documentList = ydocument.getArray("doc-list");
