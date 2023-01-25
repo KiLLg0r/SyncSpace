@@ -1,11 +1,10 @@
-import React from 'react'
-import styles from './Login.module.scss'
+import React from "react";
+import styles from "./Login.module.scss";
 import { HiOutlineMail } from "react-icons/hi";
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiLock } from "react-icons/bi";
 import { BsFacebook } from "react-icons/bs";
 import { BsGoogle } from "react-icons/bs";
-
 
 function Login() {
   return (
@@ -38,7 +37,7 @@ function Login() {
             <button type="submit">Sign In</button>
           </form>
           <div className={styles["login-card-footer"]}>
-            Don't have an account? <a href="#">Create a free account</a>.
+            Don&apos;t have an account? <a href="#">Create a free account</a>
           </div>
         </div>
         <div className={styles["login-card-social"]}>
@@ -54,8 +53,7 @@ function Login() {
         </div>
       </div>
     </div>
-
-  )
+  );
 }
 
-export default Login
+export default Login;

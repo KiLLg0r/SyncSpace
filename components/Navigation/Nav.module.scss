@@ -4,16 +4,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 3rem;
+  background-color: var(--gray-dark-100);
 
   .left {
-    span{
-      color: #FF9824;
+    span {
+      color: var(--accent);
     }
     display: flex;
     align-items: center;
-    gap: 0.5rem;
     font-size: 1.5rem;
     font-weight: bold;
+
+    svg {
+      font-size: 2rem;
+      color: var(--accent);
+    }
   }
 
   .center {
@@ -21,17 +26,30 @@
       display: flex;
       align-items: center;
 
+      &:has(input:focus) {
+        .icon {
+          outline: 2px solid var(--accent);
+        }
+      }
+
       input {
-        background-color: #36393F;
+        background-color: var(--gray-light-100);
         border: none;
         border-radius: 2.5rem 0 0 2.5rem;
         height: 2.5rem;
         width: 25rem;
+        text-indent: 1.125rem;
+        color: var(--foreground);
+        font-size: 1.125rem;
 
         &::placeholder {
-          text-indent: 1rem;
           font-size: 1.125rem;
-          color: #ffffff90;
+          text-indent: 1rem;
+          color: var(--gray-light-600);
+        }
+
+        &:focus {
+          outline: 2px solid var(--accent);
         }
       }
 
@@ -42,7 +60,7 @@
         height: 2.5rem;
         width: 3rem;
         border-radius: 0 2.5rem 2.5rem 0;
-        background-color: #FF9824;
+        background-color: var(--accent);
       }
     }
   }
@@ -53,10 +71,11 @@
       align-items: center;
       gap: 1rem;
       border: none;
-      background: #282c34;
+      background: var(--gray-light-100);
       padding: 0.25rem 0.5rem;
       padding-left: 0.75rem;
       border-radius: 2rem;
+      color: var(--foreground);
 
       .user-name {
         font-size: 1.5rem;

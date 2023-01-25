@@ -1,4 +1,4 @@
-import { RiSpaceShipLine } from "react-icons/ri";
+import { GiRingedPlanet } from "react-icons/gi";
 import { BiSearchAlt } from "react-icons/bi";
 import styles from "./Nav.module.scss";
 
@@ -6,7 +6,7 @@ const Navigation = () => {
   return (
     <nav className={styles.nav}>
       <div className={styles.left}>
-        <RiSpaceShipLine />
+        <GiRingedPlanet />
         <div className={styles.name}>
           <span>Sync</span>Space
         </div>
