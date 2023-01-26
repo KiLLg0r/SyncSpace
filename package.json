@@ -25,6 +25,7 @@
     "yjs": "^13.5.44"
   },
   "devDependencies": {
+    "@svgr/webpack": "^6.5.1",
     "react-icons": "^4.7.1"
   }
 }
