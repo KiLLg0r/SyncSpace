@@ -1,0 +1,91 @@
+.home {
+  width: 100%;
+  min-height: 100vh;
+
+  .main {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+
+    .planetContainer,
+    .text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-content: center;
+    }
+
+    .planetContainer {
+      z-index: 2;
+
+      .planet {
+        width: 29.75rem;
+      }
+    }
+
+    .text {
+      flex-direction: column;
+      z-index: 5;
+      font-size: 4.5rem;
+      font-weight: 700;
+
+      .maintext1 {
+        padding-top: 5rem;
+      }
+
+      .maintext2 {
+        padding-left: 5rem;
+
+        span {
+          color: var(--accent);
+          padding-left: 23rem;
+        }
+      }
+
+      .maintext3 {
+        padding-left: 8rem;
+        span {
+          padding-left: 25rem;
+        }
+      }
+
+      .maintext4 {
+        color: var(--accent);
+        padding-left: 15rem;
+      }
+    }
+  }
+  .features {
+    width: 100%;
+
+    .content {
+      background-color: var(--accent);
+      width: 100%;
+      height: auto;
+      min-height: 100vh;
+    }
+
+    .rectangle {
+      height: 5rem;
+      width: 100%;
+      background: var(--accent);
+
+      &.rect1 {
+        clip-path: polygon(100% 100%, 0 100%, 100% 0);
+      }
+
+      &.rect2 {
+        clip-path: polygon(0 0, 0% 100%, 100% 0);
+      }
+    }
+  }
+
+  .container {
+    width: min(100% - 2rem, 1200px);
+    margin-inline: auto;
+  }
+}
