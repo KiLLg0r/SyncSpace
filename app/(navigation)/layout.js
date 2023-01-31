@@ -1,6 +1,6 @@
-import "../../styles/globals.css";
+import "@styles/globals.css";
 
-import Navigation from "../../components/Navigation/navigation";
+import Navigation from "@components/Navigation/navigation";
 
 export default function Layout({ children }) {
   return (

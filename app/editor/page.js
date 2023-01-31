@@ -22,7 +22,7 @@ import styles from "./Editor.module.scss";
 import { BsFolderFill, BsBoxArrowLeft, BsFileCodeFill, BsFiles } from "react-icons/bs";
 
 // Components
-import File from "../../components/File/file";
+import File from "@components/File/file";
 
 let ydocument = new Y.Doc();
 let documentList = ydocument.getArray("doc-list");
@@ -118,10 +118,10 @@ const EditorComponent = () => {
             </label>
           </nav>
           <div className={styles.files}>
-            {/* <File name="app">
+            <File name="app">
               <BsFolderFill />
             </File>
-            <File name="src">
+            {/*<File name="src">
               <BsFolderFill />
             </File>
             <File name="styles">

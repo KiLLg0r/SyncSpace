@@ -4,7 +4,7 @@ import { GiRingedPlanet } from "react-icons/gi";
 import { BiSearchAlt } from "react-icons/bi";
 import { BsFillPersonFill, BsChevronDown, BsChevronUp } from "react-icons/bs";
 import styles from "./Nav.module.scss";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 
 const Navigation = () => {
   const buttonRef = useRef(null);
@@ -15,17 +15,17 @@ const Navigation = () => {
 
   const toggleDropdown = () => {
     let menuTop = chevronRef?.current?.getBoundingClientRect()?.top - buttonRef?.current?.getBoundingClientRect()?.top;
-    let menuRight = chevronRef?.current?.getBoundingClientRect()?.right - buttonRef?.current?.getBoundingClientRect()?.right;
-      if (open) {
-        menuRef.current.style.top = `${menuTop}px`;
-        menuRef.current.style.right = `${menuRight}px`;
-      } else {
-        menuRef.current.style.top = `${buttonRef?.current?.clientHeight + 10}px`;
-        menuRef.current.style.right = 0;
-      }
-      setOpen(!open);
+    let menuRight =
+      chevronRef?.current?.getBoundingClientRect()?.right - buttonRef?.current?.getBoundingClientRect()?.right;
+    if (open) {
+      menuRef.current.style.top = `${menuTop}px`;
+      menuRef.current.style.right = `${menuRight}px`;
+    } else {
+      menuRef.current.style.top = `${buttonRef?.current?.clientHeight + 10}px`;
+      menuRef.current.style.right = 0;
+    }
+    setOpen(!open);
   };
-
 
   return (
     <nav className={styles.nav}>
@@ -44,7 +44,7 @@ const Navigation = () => {
         </div>
       </div>
       <div className={styles.right}>
-        <div className={`${styles.dropdown} ${open ? styles.open : ''}`} ref={dropdownRef}>
+        <div className={`${styles.dropdown} ${open ? styles.open : ""}`} ref={dropdownRef}>
           <button ref={buttonRef} onClick={toggleDropdown}>
             <BsFillPersonFill />
             Username

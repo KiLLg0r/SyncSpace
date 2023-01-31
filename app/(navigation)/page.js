@@ -1,6 +1,5 @@
-import "../../styles/globals.css";
 import styles from "./Home.module.scss";
-import Planet from "../../public/planet.svg";
+// import Planet from "@public/planet.svg";
 
 const Home = () => {
   return (
@@ -18,7 +17,7 @@ const Home = () => {
             <div className={styles.maintext4}>LEVEL</div>
           </div>
           <div className={styles.planetContainer}>
-            <Planet className={styles.planet} />
+            <div className={styles.planet}></div>
           </div>
         </main>
       </div>

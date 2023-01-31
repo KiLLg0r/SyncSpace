@@ -21,7 +21,7 @@ function Login() {
           <form className={styles["login-card-form"]}>
             <div className={styles["form-item"]}>
               <HiOutlineMail className={styles["form-item-icon"]} />
-              <input type="text" placeholder="Enter Mail" required autofocus />
+              <input type="text" placeholder="Enter Mail" required autoFocus />
             </div>
             <div className={styles["form-item"]}>
               <BiLock className={styles["form-item-icon"]} />
@@ -30,7 +30,7 @@ function Login() {
             <div className={styles["form-item-other"]}>
               <div className={styles.checkbox}>
                 <input type="checkbox" id="rememberMeCheckbox" />
-                <label for="rememberMeCheckbox">Remember me</label>
+                <label htmlFor="rememberMeCheckbox">Remember me</label>
               </div>
               <a href="#">I forgot my password!</a>
             </div>
