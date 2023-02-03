@@ -1,4 +1,5 @@
 import "@styles/globals.css";
+import { AuthProvider } from "@context/AuthContext";
 
 export default function Layout({ children }) {
   return (
@@ -7,7 +8,9 @@ export default function Layout({ children }) {
         <title>SyncSpace</title>
       </head>
       <body>
-        <div>{children}</div>
+        <div>
+          <AuthProvider>{children}</AuthProvider>
+        </div>
       </body>
     </html>
   );

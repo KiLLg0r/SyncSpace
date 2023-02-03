@@ -1,12 +1,32 @@
-import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import styles from "./Login.module.scss";
 import { HiOutlineMail } from "react-icons/hi";
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiLock } from "react-icons/bi";
 import { BsFacebook } from "react-icons/bs";
 import { BsGoogle } from "react-icons/bs";
+import { useAuth } from "@context/AuthContext";
+import { useRouter } from "next/navigation";
 
 function Login() {
+  const { login } = useAuth();
+  const router = useRouter();
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await login(emailRef?.current?.value, passwordRef?.current?.value);
+      router.push("/");
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   return (
     <div className={styles.background}>
       <div className={styles["login-card-container"]}>
@@ -18,14 +38,25 @@ function Login() {
             <h1>Sign In</h1>
             <div>Please login to use platform</div>
           </div>
-          <form className={styles["login-card-form"]}>
+          <form className={styles["login-card-form"]} onSubmit={handleSubmit}>
             <div className={styles["form-item"]}>
               <HiOutlineMail className={styles["form-item-icon"]} />
-              <input type="text" placeholder="Enter Mail" required autoFocus />
+              <input
+                type="text"
+                placeholder="Enter Mail"
+                required
+                autoFocus
+                ref={emailRef}
+              />
             </div>
             <div className={styles["form-item"]}>
               <BiLock className={styles["form-item-icon"]} />
-              <input type="password" placeholder="Enter Password" required />
+              <input
+                type="password"
+                placeholder="Enter Password"
+                required
+                ref={passwordRef}
+              />
             </div>
             <div className={styles["form-item-other"]}>
               <div className={styles.checkbox}>
