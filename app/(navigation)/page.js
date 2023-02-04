@@ -1,5 +1,5 @@
 import styles from "./Home.module.scss";
-// import Planet from "@public/planet.svg";
+import Link from "next/link";
 
 const Home = () => {
   return (
@@ -21,6 +21,7 @@ const Home = () => {
           </div>
         </main>
       </div>
+      <Link href="/new">New project</Link>
       <div className={styles.features}>
         <div className={`${styles.rectangle} ${styles.rect1}`}></div>
         <main className={styles.content}>

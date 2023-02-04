@@ -2,6 +2,7 @@
 
 :root {
   --accent: #ff9824;
+  --accent-dark: #c56900;
   --red: #c92b2b;
   --red-dark: #841c1c;
   --background: var(--gray);

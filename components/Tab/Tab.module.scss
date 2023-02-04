@@ -1,0 +1,63 @@
+.tabContainer {
+  display: inline-block;
+  position: relative;
+
+  svg {
+    font-size: 1.75rem;
+  }
+
+  .tab {
+    cursor: pointer;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    padding-right: 2.5rem;
+    background-color: var(--gray-dark-200);
+    border-radius: 0.5rem 0.5rem 0 0;
+    margin-right: 0.25rem;
+    position: relative;
+
+    &:hover {
+      background-color: var(--gray-dark-400);
+    }
+
+    &.active {
+      background-color: var(--accent-dark);
+
+      &:hover {
+        background-color: var(--accent);
+      }
+
+      & + .closeBtn:hover {
+        background-color: var(--accent);
+      }
+    }
+  }
+
+  &:has(.closeBtn:hover) {
+    .tab {
+      pointer-events: none;
+      &:hover {
+        background-color: var(--gray-dark-200);
+      }
+
+      &.active:hover {
+        background-color: var(--accent-dark);
+      }
+    }
+  }
+
+  .closeBtn {
+    position: absolute;
+    top: 0.625rem;
+    right: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--gray-light-200);
+    }
+  }
+}

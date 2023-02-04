@@ -13,58 +13,45 @@ import { MonacoBinding } from "../../lib/y-monaco";
 
 // Other imports
 import randomColor from "randomcolor";
-const { uniqueNamesGenerator, adjectives, colors, animals } = require("unique-names-generator");
+const { uniqueNamesGenerator, adjectives, colors, animals, languages } = require("unique-names-generator");
 
 // Styles
 import styles from "./Editor.module.scss";
 
 // Icons
-import { BsFolderFill, BsBoxArrowLeft, BsFileCodeFill, BsFiles } from "react-icons/bs";
+import { BsFolderFill, BsBoxArrowLeft, BsFiles } from "react-icons/bs";
 
 // Components
-import File from "@components/File/file";
+import FileExplorer from "@components/File explorer/fileExplorer";
+import Tab from "@components/Tab/tab";
+
+// Firebase
+import { ref, getBytes } from "firebase/storage";
+import { storage } from "@config/firebase";
+
+// Utils
+import { getLanguage } from "@utils/languages";
 
 let ydocument = new Y.Doc();
-let documentList = ydocument.getArray("doc-list");
+let documentList = ydocument.getMap("project-files");
+let monacoEditor = null;
+let monacoInstance = null;
 let provider = null;
 let awareness = null;
 let monacoBinding = null;
 
 const EditorComponent = () => {
-  const [editorRef, setEditorRef] = useState(null);
   const [code, setCode] = useState("");
-  const [docs, setDocs] = useState(documentList);
+  const [editorRef, setEditorRef] = useState(null);
+  const [projectRef, setProjectRef] = useState(ref(storage, "projects/SyncSpace"));
+  const [tabs, setTabs] = useState({});
+  const tabsContainerRef = useRef(null);
 
   const handleEditorDidMount = (editor, monaco) => {
+    monacoEditor = editor;
+    monacoInstance = monaco;
     setEditorRef(editor);
-  };
-
-  const bindEditor = (ytext) => {
-    if (monacoBinding) monacoBinding.destroy();
-    const yUndoManager = new Y.UndoManager(ytext);
-    monacoBinding = new MonacoBinding(ytext, editorRef.getModel(), new Set([editorRef]), awareness, {
-      yUndoManager,
-    });
-  };
-
-  const filesSelect = (event) => {
-    const pressedButton = event.target;
-    const val = pressedButton.getAttribute("index");
-    if (editorRef && pressedButton.tagName !== "DIV")
-      if (val === "new") {
-        const newDoc = new Y.Text("");
-
-        newDoc.applyDelta([{ insert: `const name = 'File #${documentList.length}';` }, { insert: "\n" }]);
-
-        documentList.insert(documentList.length, [newDoc]);
-
-        bindEditor(newDoc);
-      } else if (val === "clear") {
-        documentList.delete(0, documentList.length);
-      } else {
-        const index = Number.parseInt(val);
-        bindEditor(documentList.get(index));
-      }
+    alert("Editor mounted!");
   };
 
   useEffect(() => {
@@ -95,6 +82,80 @@ const EditorComponent = () => {
     }
   }, [editorRef]);
 
+  const bindEditor = (ytext) => {
+    if (monacoBinding) monacoBinding.destroy();
+    const yUndoManager = new Y.UndoManager(ytext);
+    monacoBinding = new MonacoBinding(ytext, monacoEditor.getModel(), new Set([monacoEditor]), awareness, {
+      yUndoManager,
+    });
+  };
+
+  const handleClick = async (docRef) => {
+    let content;
+
+    const removedRootName = docRef.fullPath.substring(docRef.fullPath.indexOf("/") + 1);
+    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
+
+    const fileExtension = docRef.name.split(".").pop();
+    const language = getLanguage(fileExtension);
+
+    let tab = null;
+    if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
+
+    const newObject = { ...tabs };
+    if (tab !== null) newObject[tab] = false;
+    newObject[removedProjectName] = true;
+    setTabs(newObject);
+
+    monacoInstance.editor.setModelLanguage(monacoInstance.editor.getModels()[0], language);
+
+    if (documentList.has(removedProjectName)) {
+      bindEditor(documentList.get(removedProjectName));
+    } else {
+      await getBytes(docRef)
+        .then((res) => {
+          const decoder = new TextDecoder();
+          content = decoder.decode(res);
+        })
+        .catch((error) => alert(error));
+
+      const newDoc = new Y.Text("");
+      newDoc.applyDelta([{ insert: content }]);
+      documentList.set(removedProjectName, newDoc);
+
+      bindEditor(newDoc);
+    }
+  };
+
+  const changeTab = (name) => {
+    const fileExtension = name.split(".").pop();
+    const language = getLanguage(fileExtension);
+
+    let tab = null;
+    if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
+
+    const newObject = { ...tabs };
+    if (tab !== null) newObject[tab] = false;
+    newObject[name] = true;
+    setTabs(newObject);
+
+    monacoInstance.editor.setModelLanguage(monacoInstance.editor.getModels()[0], language);
+
+    bindEditor(documentList.get(name));
+  };
+
+  const closeTab = (name) => {
+    const newObject = { ...tabs };
+    delete newObject[name];
+    setTabs(newObject);
+  };
+
+  const handleScroll = (e) => {
+    e.preventDefault();
+    const tabsContainer = tabsContainerRef?.current;
+    tabsContainer.scrollLeft += e.deltaY;
+  };
+
   return (
     <div className={styles.editor}>
       <header className={styles.header}>
@@ -118,49 +179,33 @@ const EditorComponent = () => {
             </label>
           </nav>
           <div className={styles.files}>
-            <File name="app">
-              <BsFolderFill />
-            </File>
-            {/*<File name="src">
-              <BsFolderFill />
-            </File>
-            <File name="styles">
-              <BsFolderFill />
-            </File>
-            <File name="lib">
-              <BsFolderFill />
-            </File>
-            <File name="index.js">
-              <BsFileCodeFill />
-            </File>
-            <File name="routes.js">
-              <BsFileCodeFill />
-            </File> */}
-            <div onClick={filesSelect}>
-              <input type="button" index="new" value="+ Create New Document" />
-              <input type="button" index="clear" value="- Delete All" />
-              {docs &&
-                docs.toArray().map((ytext, i) => {
-                  return <input type="button" index={i} value={`File ${i}`} key={i} />;
-                })}
-            </div>
+            <FileExplorer docRef={projectRef} onClick={handleClick} />
           </div>
         </aside>
         <section>
-          <nav className={styles.tabs}>
-            <ul>
-              <li className={styles.tab}>index.js</li>
-              <li className={styles.tab}>routes.js</li>
-            </ul>
+          <nav className={styles.tabs} onWheel={(e) => handleScroll(e)} ref={tabsContainerRef}>
+            {tabs &&
+              Object.keys(tabs).map((key, index) => {
+                return (
+                  <Tab
+                    name={key.split("/").pop()}
+                    path={key}
+                    active={tabs[key]}
+                    key={index}
+                    onClose={() => closeTab(key)}
+                    onClick={() => changeTab(key)}
+                  />
+                );
+              })}
           </nav>
-          <div style={{ opacity: monacoBinding === null && "0" }}>
+          <div style={{ display: (monacoBinding === null || Object.values(tabs).indexOf(true) < 0) && "none" }}>
             <Editor
               height={"calc(100vh - 7rem)"}
-              language="javascript"
               theme="vs-dark"
               value={code}
               onChange={setCode}
               onMount={handleEditorDidMount}
+              className={styles.editor}
             />
           </div>
         </section>
