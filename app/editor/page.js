@@ -24,6 +24,7 @@ import { BsFolderFill, BsBoxArrowLeft, BsFiles } from "react-icons/bs";
 // Components
 import FileExplorer from "@components/File explorer/fileExplorer";
 import Tab from "@components/Tab/tab";
+import Loading from "@components/Loading/loading";
 
 // Firebase
 import { ref, getBytes } from "firebase/storage";
@@ -51,7 +52,6 @@ const EditorComponent = () => {
     monacoEditor = editor;
     monacoInstance = monaco;
     setEditorRef(editor);
-    alert("Editor mounted!");
   };
 
   useEffect(() => {
@@ -158,6 +158,7 @@ const EditorComponent = () => {
 
   return (
     <div className={styles.editor}>
+      {editorRef === null && <Loading />}
       <header className={styles.header}>
         <div className={styles.leftSide}>
           <BsFolderFill className={styles.icon} />

@@ -12,6 +12,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import auth from "@config/firebase";
+import Loading from "@components/Loading/loading";
 
 const AuthContext = React.createContext();
 
@@ -80,5 +81,5 @@ export function AuthProvider({ children }) {
     sendUserPasswordResetEmail,
   };
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{loading ? <Loading /> : children}</AuthContext.Provider>;
 }
