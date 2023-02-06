@@ -1,10 +1,25 @@
 .file,
 .folder {
+  border-radius: 0.5rem;
+
+  &.focused {
+    background: var(--gray);
+    .content:hover {
+      background: var(--gray-light-200);
+    }
+  }
+
   .content {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+    padding-block: 0.05rem;
+    border-radius: 0.5rem;
+
+    &:hover {
+      background: var(--gray);
+    }
   }
 }
 
@@ -14,6 +29,10 @@
 
 .folder {
   padding-left: 0.5rem;
+
+  .content:hover {
+    background: var(--gray);
+  }
 
   .children {
     transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);

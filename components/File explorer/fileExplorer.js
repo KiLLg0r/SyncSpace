@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { listAll } from "firebase/storage";
 import { File, Folder } from "@components/File/file";
 
-const FolderTree = ({ docRef, onClick }) => {
+const FolderTree = ({ docRef, onClick, focusedItem, rightClick }) => {
   const [docs, setDocs] = useState(null);
 
   useEffect(() => {
@@ -21,18 +21,35 @@ const FolderTree = ({ docRef, onClick }) => {
     <>
       {docs?.prefixes?.length > 0 &&
         docs.prefixes.map((doc, index) => (
-          <Folder name={doc.name} key={index}>
-            <FolderTree docRef={doc} onClick={onClick} />
+          <Folder
+            name={doc.name}
+            key={index}
+            onClick={() => onClick(doc, true)}
+            focused={focusedItem === doc.fullPath}
+            rightClick={rightClick}
+          >
+            <FolderTree docRef={doc} onClick={onClick} focusedItem={focusedItem} rightClick={rightClick} />
           </Folder>
         ))}
       {docs?.items?.length > 0 &&
-        docs.items.map((doc, index) => <File name={doc.name} key={index} onClick={() => onClick(doc)}></File>)}
+        docs.items.map(
+          (doc, index) =>
+            doc.name !== "‎" && (
+              <File
+                name={doc.name}
+                key={index}
+                onClick={() => onClick(doc, false)}
+                focused={focusedItem === doc.fullPath}
+                rightClick={rightClick}
+              ></File>
+            ),
+        )}
     </>
   );
 };
 
-const FileExplorer = ({ docRef, onClick }) => {
-  return <FolderTree docRef={docRef} onClick={onClick} />;
+const FileExplorer = ({ docRef, onClick, focusedItem, rightClick }) => {
+  return <FolderTree docRef={docRef} onClick={onClick} focusedItem={focusedItem} rightClick={rightClick} />;
 };
 
 export default React.memo(FileExplorer);

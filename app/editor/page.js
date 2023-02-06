@@ -19,7 +19,7 @@ const { uniqueNamesGenerator, adjectives, colors, animals, languages } = require
 import styles from "./Editor.module.scss";
 
 // Icons
-import { BsFolderFill, BsBoxArrowLeft, BsFiles } from "react-icons/bs";
+import { BsFolderFill, BsBoxArrowLeft, BsFiles, BsFolderPlus, BsFilePlus } from "react-icons/bs";
 
 // Components
 import FileExplorer from "@components/File explorer/fileExplorer";
@@ -27,7 +27,7 @@ import Tab from "@components/Tab/tab";
 import Loading from "@components/Loading/loading";
 
 // Firebase
-import { ref, getBytes } from "firebase/storage";
+import { ref, getBytes, uploadString, uploadBytes } from "firebase/storage";
 import { storage } from "@config/firebase";
 
 // Utils
@@ -46,7 +46,9 @@ const EditorComponent = () => {
   const [editorRef, setEditorRef] = useState(null);
   const [projectRef, setProjectRef] = useState(ref(storage, "projects/SyncSpace"));
   const [tabs, setTabs] = useState({});
+  const [focus, setFocus] = useState({ path: "projects/SyncSpace/" });
   const tabsContainerRef = useRef(null);
+  const [newUpdate, updateState] = React.useState();
 
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
@@ -90,7 +92,12 @@ const EditorComponent = () => {
     });
   };
 
-  const handleClick = async (docRef) => {
+  const handleClick = async (docRef, folder) => {
+    if (folder) {
+      setFocus({ path: docRef.fullPath });
+      return;
+    }
+
     let content;
 
     const removedRootName = docRef.fullPath.substring(docRef.fullPath.indexOf("/") + 1);
@@ -106,6 +113,8 @@ const EditorComponent = () => {
     if (tab !== null) newObject[tab] = false;
     newObject[removedProjectName] = true;
     setTabs(newObject);
+
+    setFocus({ path: docRef.fullPath });
 
     monacoInstance.editor.setModelLanguage(monacoInstance.editor.getModels()[0], language);
 
@@ -156,6 +165,48 @@ const EditorComponent = () => {
     tabsContainer.scrollLeft += e.deltaY;
   };
 
+  const addNewFolder = (e) => {
+    e.preventDefault();
+    const folderName = prompt("Folder name");
+    const initialLength = focus.path.length;
+    const checkForFile = focus.path.split(".").pop();
+    const newPath =
+      checkForFile.length > initialLength
+        ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${folderName}/‎`
+        : `${focus.path}/${folderName}/‎`;
+    const storageRef = ref(storage, newPath);
+    uploadString(storageRef, "").then(() => {
+      updateState({});
+      setFocus({ path: newPath });
+    });
+  };
+
+  const addNewFile = (e) => {
+    e.preventDefault();
+    toggleModal();
+    const fileName = prompt("File name");
+    const initialLength = focus.path.length;
+    const checkForFile = focus.path.split(".").pop();
+    const newPath =
+      checkForFile.length > initialLength
+        ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${fileName}`
+        : `${focus.path}/${fileName}`;
+    const storageRef = ref(storage, newPath);
+    uploadString(storageRef, "\n")
+      .then(() => {
+        console.log(newPath);
+        updateState({});
+        setFocus({ path: newPath });
+      })
+      .catch((error) => alert(error));
+  };
+
+  const toggleModal = (e) => {
+    e.preventDefault();
+    const { classList } = document.body;
+    classList.toggle("modal-open");
+  };
+
   return (
     <div className={styles.editor}>
       {editorRef === null && <Loading />}
@@ -180,7 +231,26 @@ const EditorComponent = () => {
             </label>
           </nav>
           <div className={styles.files}>
-            <FileExplorer docRef={projectRef} onClick={handleClick} />
+            <div className={styles.actionButtons}>
+              <button className={styles.button} onClick={addNewFile}>
+                <BsFilePlus />
+                New file
+              </button>
+              <button className={styles.button} onClick={addNewFolder}>
+                <BsFolderPlus />
+                New folder
+              </button>
+            </div>
+            <FileExplorer
+              docRef={projectRef}
+              onClick={handleClick}
+              focusedItem={focus.path}
+              key={newUpdate}
+              rightClick={(e) => {
+                e.preventDefault();
+                alert("Right clicked!");
+              }}
+            />
           </div>
         </aside>
         <section>
@@ -211,6 +281,8 @@ const EditorComponent = () => {
           </div>
         </section>
       </main>
+      <div className={styles.modalBackground} onClick={toggleModal}></div>
+      <div className={styles.modal}>Something</div>
     </div>
   );
 };
