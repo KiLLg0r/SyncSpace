@@ -13,25 +13,13 @@ import { MonacoBinding } from "../../lib/y-monaco";
 
 // Other imports
 import randomColor from "randomcolor";
-const {
-  uniqueNamesGenerator,
-  adjectives,
-  colors,
-  animals,
-  languages,
-} = require("unique-names-generator");
+const { uniqueNamesGenerator, adjectives, colors, animals, languages } = require("unique-names-generator");
 
 // Styles
 import styles from "./Editor.module.scss";
 
 // Icons
-import {
-  BsFolderFill,
-  BsBoxArrowLeft,
-  BsFiles,
-  BsFolderPlus,
-  BsFilePlus,
-} from "react-icons/bs";
+import { BsFolderFill, BsBoxArrowLeft, BsFiles, BsFolderPlus, BsFilePlus } from "react-icons/bs";
 
 // Components
 import FileExplorer from "@components/File explorer/fileExplorer";
@@ -40,7 +28,7 @@ import Loading from "@components/Loading/loading";
 import Modal from "@components/Modal/modal";
 
 // Firebase
-import { ref, getBytes, uploadString, uploadBytes } from "firebase/storage";
+import { ref, getBytes, uploadString, deleteObject, listAll } from "firebase/storage";
 import { storage } from "@config/firebase";
 
 // Utils
@@ -57,17 +45,19 @@ let monacoBinding = null;
 const EditorComponent = () => {
   const [code, setCode] = useState("");
   const [editorRef, setEditorRef] = useState(null);
-  const [projectRef, setProjectRef] = useState(
-    ref(storage, "projects/SyncSpace")
-  );
+  const [projectRef, setProjectRef] = useState(ref(storage, "projects/SyncSpace"));
   const [tabs, setTabs] = useState({});
   const [focus, setFocus] = useState({ path: "projects/SyncSpace/" });
-  const tabsContainerRef = useRef(null);
   const [newUpdate, updateState] = useState();
-  const folderRef = useRef(null);
-  const fileRef = useRef(null);
   const [newFileModal, setNewFileModal] = useState(false);
   const [newFolderModal, setNewFolderModal] = useState(false);
+  const [rightClick, setRightClick] = useState(false);
+  const [xy, setXY] = useState({ x: 0, y: 0 });
+  const [deletedPath, setDeletedPath] = useState({ path: "", folder: false });
+  
+  const tabsContainerRef = useRef(null);
+  const folderRef = useRef(null);
+  const fileRef = useRef(null);
 
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
@@ -108,15 +98,9 @@ const EditorComponent = () => {
   const bindEditor = (ytext) => {
     if (monacoBinding) monacoBinding.destroy();
     const yUndoManager = new Y.UndoManager(ytext);
-    monacoBinding = new MonacoBinding(
-      ytext,
-      monacoEditor.getModel(),
-      new Set([monacoEditor]),
-      awareness,
-      {
-        yUndoManager,
-      }
-    );
+    monacoBinding = new MonacoBinding(ytext, monacoEditor.getModel(), new Set([monacoEditor]), awareness, {
+      yUndoManager,
+    });
   };
 
   const handleClick = async (docRef, folder) => {
@@ -127,19 +111,14 @@ const EditorComponent = () => {
 
     let content;
 
-    const removedRootName = docRef.fullPath.substring(
-      docRef.fullPath.indexOf("/") + 1
-    );
-    const removedProjectName = removedRootName.substring(
-      removedRootName.indexOf("/") + 1
-    );
+    const removedRootName = docRef.fullPath.substring(docRef.fullPath.indexOf("/") + 1);
+    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
 
     const fileExtension = docRef.name.split(".").pop();
     const language = getLanguage(fileExtension);
 
     let tab = null;
-    if (Object.values(tabs).indexOf(true) > -1)
-      tab = Object.keys(tabs).find((key) => tabs[key] === true);
+    if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
 
     const newObject = { ...tabs };
     if (tab !== null) newObject[tab] = false;
@@ -148,10 +127,7 @@ const EditorComponent = () => {
 
     setFocus({ path: docRef.fullPath });
 
-    monacoInstance.editor.setModelLanguage(
-      monacoInstance.editor.getModels()[0],
-      language
-    );
+    monacoInstance.editor.setModelLanguage(monacoInstance.editor.getModels()[0], language);
 
     if (documentList.has(removedProjectName)) {
       bindEditor(documentList.get(removedProjectName));
@@ -176,18 +152,14 @@ const EditorComponent = () => {
     const language = getLanguage(fileExtension);
 
     let tab = null;
-    if (Object.values(tabs).indexOf(true) > -1)
-      tab = Object.keys(tabs).find((key) => tabs[key] === true);
+    if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
 
     const newObject = { ...tabs };
     if (tab !== null) newObject[tab] = false;
     newObject[name] = true;
     setTabs(newObject);
 
-    monacoInstance.editor.setModelLanguage(
-      monacoInstance.editor.getModels()[0],
-      language
-    );
+    monacoInstance.editor.setModelLanguage(monacoInstance.editor.getModels()[0], language);
 
     bindEditor(documentList.get(name));
   };
@@ -211,15 +183,12 @@ const EditorComponent = () => {
     const checkForFile = focus.path.split(".").pop();
     const newPath =
       checkForFile.length < initialLength
-        ? `${focus.path.substring(
-            0,
-            focus.path.lastIndexOf("/") + 1
-          )}/${folderName}/‎`
+        ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${folderName}/‎`
         : `${focus.path}/${folderName}/‎`;
     const storageRef = ref(storage, newPath);
     uploadString(storageRef, "").then(() => {
       setNewFolderModal(false);
-      updateState({});
+      updateState(newPath);
       setFocus({ path: newPath });
     });
   };
@@ -231,19 +200,55 @@ const EditorComponent = () => {
     const checkForFile = focus.path.split(".").pop();
     const newPath =
       checkForFile.length < initialLength
-        ? `${focus.path.substring(
-            0,
-            focus.path.lastIndexOf("/") + 1
-          )}/${fileName}`
+        ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${fileName}`
         : `${focus.path}/${fileName}`;
     const storageRef = ref(storage, newPath);
     uploadString(storageRef, "\n")
       .then(() => {
         setNewFileModal(false);
-        updateState({});
+        updateState(newPath);
         setFocus({ path: newPath });
       })
       .catch((error) => alert(error));
+  };
+
+  const rightClickHandle = (e, path, folder = false) => {
+    e.preventDefault();
+    setRightClick(false);
+    const coord = {
+      x: e.pageX,
+      y: e.pageY,
+    };
+    setXY(coord);
+    setRightClick(true);
+    setDeletedPath({ path: path, folder: folder });
+  };
+
+  function deleteFolder(path) {
+    const storageRef = ref(storage, path);
+    listAll(storageRef)
+      .then((dir) => {
+        dir.items.forEach((fileRef) => deleteFile(fileRef.fullPath));
+        dir.prefixes.forEach((folderRef) => deleteFolder(folderRef.fullPath));
+      })
+      .catch((error) => console.log(error));
+  }
+
+  function deleteFile(pathToFile) {
+    const storageRef = ref(storage, pathToFile);
+    deleteObject(storageRef)
+      .then(() => {
+        setDeletedPath({ path: "", folder: false });
+        updateState(pathToFile);
+        setRightClick(false);
+      })
+      .catch((error) => console.log(error));
+  }
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    if (deletedPath.folder) deleteFolder(deletedPath.path);
+    else deleteFile(deletedPath.path);
   };
 
   return (
@@ -271,11 +276,7 @@ const EditorComponent = () => {
           </nav>
           <div className={styles.files}>
             <div className={styles.actionButtons}>
-              <button
-                type="button"
-                className={styles.button}
-                onClick={() => setNewFileModal(true)}
-              >
+              <button type="button" className={styles.button} onClick={() => setNewFileModal(true)}>
                 <BsFilePlus />
                 New file
               </button>
@@ -294,18 +295,11 @@ const EditorComponent = () => {
                   </button>
                 </form>
               </Modal>
-              <button
-                type="button"
-                className={styles.button}
-                onClick={() => setNewFolderModal(true)}
-              >
+              <button type="button" className={styles.button} onClick={() => setNewFolderModal(true)}>
                 <BsFolderPlus />
                 New folder
               </button>
-              <Modal
-                open={newFolderModal}
-                onClose={() => setNewFolderModal(false)}
-              >
+              <Modal open={newFolderModal} onClose={() => setNewFolderModal(false)}>
                 <h2>Folder name</h2>
                 <form onSubmit={addNewFolder}>
                   <input
@@ -326,19 +320,12 @@ const EditorComponent = () => {
               onClick={handleClick}
               focusedItem={focus.path}
               key={newUpdate}
-              rightClick={(e) => {
-                e.preventDefault();
-                alert("Right clicked!");
-              }}
+              rightClick={rightClickHandle}
             />
           </div>
         </aside>
         <section>
-          <nav
-            className={styles.tabs}
-            onWheel={(e) => handleScroll(e)}
-            ref={tabsContainerRef}
-          >
+          <nav className={styles.tabs} onWheel={(e) => handleScroll(e)} ref={tabsContainerRef}>
             {tabs &&
               Object.keys(tabs).map((key, index) => {
                 return (
@@ -355,10 +342,7 @@ const EditorComponent = () => {
           </nav>
           <div
             style={{
-              display:
-                (monacoBinding === null ||
-                  Object.values(tabs).indexOf(true) < 0) &&
-                "none",
+              display: (monacoBinding === null || Object.values(tabs).indexOf(true) < 0) && "none",
             }}
           >
             <Editor
@@ -372,6 +356,13 @@ const EditorComponent = () => {
           </div>
         </section>
       </main>
+      {rightClick && (
+        <div className={styles.rightClick} style={{ top: xy.y, left: xy.x }}>
+          <button type="button" onClick={handleDelete}>
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 };

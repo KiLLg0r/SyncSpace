@@ -48,12 +48,13 @@
       width: var(--side-bar-width);
     }
     .files {
-      transform: translateX(-105%);
+      transform: translateX(-110%);
     }
   }
 
   .sidebar {
     height: calc(100vh - 4rem);
+    overflow: hidden;
 
     display: flex;
     position: relative;
@@ -89,7 +90,7 @@
     }
 
     .files {
-      background-color: var(--gray-light-100);
+      background-color: var(--gray-dark-200);
       margin: 0.5rem;
       padding: 1rem;
       border-radius: 1rem;
@@ -206,5 +207,23 @@
 
   &:hover {
     background: var(--accent-dark);
+  }
+}
+
+.rightClick {
+  position: absolute;
+
+  z-index: 100;
+
+  button {
+    all: unset;
+    border-radius: 0.5rem;
+    background: var(--gray-light-100);
+    padding: 0.5rem 2rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--gray-light-300);
+    }
   }
 }

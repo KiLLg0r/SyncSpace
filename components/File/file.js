@@ -11,8 +11,8 @@ const Folder = React.memo(function Folder({ children, name, focused, onClick, ri
   };
 
   return (
-    <div className={`${styles.folder} ${focused && styles.focused}`} onContextMenu={rightClick}>
-      <div className={styles.content} onClick={handleClick}>
+    <div className={`${styles.folder} ${focused && styles.focused}`}>
+      <div className={styles.content} onClick={handleClick} onContextMenu={rightClick}>
         <BsChevronUp className={`${styles.chevron} ${close && styles.closedFolder}`} />
         <BsFolderFill />
         {name}

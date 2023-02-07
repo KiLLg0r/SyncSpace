@@ -26,7 +26,7 @@ const FolderTree = ({ docRef, onClick, focusedItem, rightClick }) => {
             key={index}
             onClick={() => onClick(doc, true)}
             focused={focusedItem === doc.fullPath}
-            rightClick={rightClick}
+            rightClick={(e) => rightClick(e, doc.fullPath, true)}
           >
             <FolderTree docRef={doc} onClick={onClick} focusedItem={focusedItem} rightClick={rightClick} />
           </Folder>
@@ -40,7 +40,7 @@ const FolderTree = ({ docRef, onClick, focusedItem, rightClick }) => {
                 key={index}
                 onClick={() => onClick(doc, false)}
                 focused={focusedItem === doc.fullPath}
-                rightClick={rightClick}
+                rightClick={(e) => rightClick(e, doc.fullPath)}
               ></File>
             ),
         )}
