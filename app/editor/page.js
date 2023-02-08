@@ -1,6 +1,6 @@
 "use client";
 // Next / Reacts imports
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 
 // Monaco Editor import
@@ -54,7 +54,7 @@ const EditorComponent = () => {
   const [rightClick, setRightClick] = useState(false);
   const [xy, setXY] = useState({ x: 0, y: 0 });
   const [deletedPath, setDeletedPath] = useState({ path: "", folder: false });
-  
+
   const tabsContainerRef = useRef(null);
   const folderRef = useRef(null);
   const fileRef = useRef(null);
@@ -103,7 +103,7 @@ const EditorComponent = () => {
     });
   };
 
-  const handleClick = async (docRef, folder) => {
+  const handleClick = async (docRef, folder = false) => {
     if (folder) {
       setFocus({ path: docRef.fullPath });
       return;
@@ -178,39 +178,51 @@ const EditorComponent = () => {
 
   const addNewFolder = (e) => {
     e.preventDefault();
+
     const folderName = folderRef.current.value;
     const initialLength = focus.path.length;
+
     const checkForFile = focus.path.split(".").pop();
     const newPath =
       checkForFile.length < initialLength
         ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${folderName}/‎`
         : `${focus.path}/${folderName}/‎`;
+
     const storageRef = ref(storage, newPath);
+
     uploadString(storageRef, "").then(() => {
       setNewFolderModal(false);
       updateState(newPath);
-      setFocus({ path: newPath });
+      handleClick(storageRef, true);
     });
   };
 
   const addNewFile = (e) => {
     e.preventDefault();
+
     const fileName = fileRef.current.value;
     const initialLength = focus.path.length;
+
     const checkForFile = focus.path.split(".").pop();
     const newPath =
       checkForFile.length < initialLength
         ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${fileName}`
         : `${focus.path}/${fileName}`;
+
     const storageRef = ref(storage, newPath);
+
     uploadString(storageRef, "\n")
       .then(() => {
         setNewFileModal(false);
         updateState(newPath);
-        setFocus({ path: newPath });
+        handleClick(storageRef);
       })
       .catch((error) => alert(error));
   };
+
+  const documentClick = useCallback(() => {
+    rightClick && setRightClick(false);
+  }, [rightClick]);
 
   const rightClickHandle = (e, path, folder = false) => {
     e.preventDefault();
@@ -236,6 +248,11 @@ const EditorComponent = () => {
 
   function deleteFile(pathToFile) {
     const storageRef = ref(storage, pathToFile);
+    const removedRootName = pathToFile.substring(pathToFile.indexOf("/") + 1);
+    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
+
+    closeTab(removedProjectName);
+
     deleteObject(storageRef)
       .then(() => {
         setDeletedPath({ path: "", folder: false });
@@ -250,6 +267,11 @@ const EditorComponent = () => {
     if (deletedPath.folder) deleteFolder(deletedPath.path);
     else deleteFile(deletedPath.path);
   };
+
+  useEffect(() => {
+    document.addEventListener("click", documentClick);
+    return () => document.removeEventListener("click", documentClick);
+  });
 
   return (
     <div className={styles.editor}>

@@ -3,9 +3,9 @@
   border-radius: 0.5rem;
 
   &.focused {
-    background: var(--gray);
+    background: var(--gray-light-100);
     .content:hover {
-      background: var(--gray-light-200);
+      background: var(--gray-light-300);
     }
   }
 
@@ -18,7 +18,7 @@
     border-radius: 0.5rem;
 
     &:hover {
-      background: var(--gray);
+      background: var(--gray-light-100);
     }
   }
 }
@@ -33,7 +33,7 @@
   padding-left: 0.5rem;
 
   .content:hover {
-    background: var(--gray);
+    background: var(--gray-light-100);
   }
 
   .children {
