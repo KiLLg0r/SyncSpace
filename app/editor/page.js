@@ -28,7 +28,7 @@ import Loading from "@components/Loading/loading";
 import Modal from "@components/Modal/modal";
 
 // Firebase
-import { ref, getBytes, uploadString, deleteObject, listAll } from "firebase/storage";
+import { ref, getBytes, uploadString, deleteObject, listAll, uploadBytes } from "firebase/storage";
 import { storage } from "@config/firebase";
 
 // Utils
@@ -121,7 +121,10 @@ const EditorComponent = () => {
     if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
 
     const newObject = { ...tabs };
-    if (tab !== null) newObject[tab] = false;
+    if (tab !== null) {
+      saveFile(tab);
+      newObject[tab] = false;
+    }
     newObject[removedProjectName] = true;
     setTabs(newObject);
 
@@ -155,7 +158,10 @@ const EditorComponent = () => {
     if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
 
     const newObject = { ...tabs };
-    if (tab !== null) newObject[tab] = false;
+    if (tab !== null && tab.localeCompare(name) != 0) {
+      saveFile(tab);
+      newObject[tab] = false;
+    }
     newObject[name] = true;
     setTabs(newObject);
 
@@ -165,6 +171,8 @@ const EditorComponent = () => {
   };
 
   const closeTab = (name) => {
+    setFocus({ path: "projects/SyncSpace/" });
+    saveFile(name);
     const newObject = { ...tabs };
     delete newObject[name];
     setTabs(newObject);
@@ -236,7 +244,7 @@ const EditorComponent = () => {
     setDeletedPath({ path: path, folder: folder });
   };
 
-  function deleteFolder(path) {
+  const deleteFolder = (path) => {
     const storageRef = ref(storage, path);
     listAll(storageRef)
       .then((dir) => {
@@ -244,9 +252,9 @@ const EditorComponent = () => {
         dir.prefixes.forEach((folderRef) => deleteFolder(folderRef.fullPath));
       })
       .catch((error) => console.log(error));
-  }
+  };
 
-  function deleteFile(pathToFile) {
+  const deleteFile = (pathToFile) => {
     const storageRef = ref(storage, pathToFile);
     const removedRootName = pathToFile.substring(pathToFile.indexOf("/") + 1);
     const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
@@ -260,7 +268,7 @@ const EditorComponent = () => {
         setRightClick(false);
       })
       .catch((error) => console.log(error));
-  }
+  };
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -268,10 +276,37 @@ const EditorComponent = () => {
     else deleteFile(deletedPath.path);
   };
 
+  const saveFile = (name, value = null) => {
+    const storageRef = ref(storage, `/projects/SyncSpace/${name}`);
+    let data;
+
+    if (value === null) {
+      const content = documentList.get(name).toString();
+
+      const encoder = new TextEncoder();
+      data = encoder.encode(content);
+    } else data = value;
+
+    uploadBytes(storageRef, data)
+      .then()
+      .catch((error) => console.log(error));
+  };
+
   useEffect(() => {
     document.addEventListener("click", documentClick);
     return () => document.removeEventListener("click", documentClick);
   });
+
+  useEffect(() => {
+    const save = setInterval(() => {
+      let tab = null;
+      if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
+
+      if (tab !== null) saveFile(tab);
+    }, 60 * 1000);
+
+    return () => clearInterval(save);
+  }, [tabs]);
 
   return (
     <div className={styles.editor}>
