@@ -51,13 +51,16 @@ const EditorComponent = () => {
   const [newUpdate, updateState] = useState();
   const [newFileModal, setNewFileModal] = useState(false);
   const [newFolderModal, setNewFolderModal] = useState(false);
+  const [renameModal, setRenameModal] = useState(false);
   const [rightClick, setRightClick] = useState(false);
   const [xy, setXY] = useState({ x: 0, y: 0 });
-  const [deletedPath, setDeletedPath] = useState({ path: "", folder: false });
+  const [path, setPath] = useState({ path: "", folder: false });
+  const [previousName, setPreviousName] = useState("");
 
   const tabsContainerRef = useRef(null);
-  const folderRef = useRef(null);
-  const fileRef = useRef(null);
+  const folderNameRef = useRef(null);
+  const fileNameRef = useRef(null);
+  const renameRef = useRef(null);
 
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
@@ -187,7 +190,7 @@ const EditorComponent = () => {
   const addNewFolder = (e) => {
     e.preventDefault();
 
-    const folderName = folderRef.current.value;
+    const folderName = folderNameRef.current.value;
     const initialLength = focus.path.length;
 
     const checkForFile = focus.path.split(".").pop();
@@ -208,7 +211,7 @@ const EditorComponent = () => {
   const addNewFile = (e) => {
     e.preventDefault();
 
-    const fileName = fileRef.current.value;
+    const fileName = fileNameRef.current.value;
     const initialLength = focus.path.length;
 
     const checkForFile = focus.path.split(".").pop();
@@ -241,7 +244,8 @@ const EditorComponent = () => {
     };
     setXY(coord);
     setRightClick(true);
-    setDeletedPath({ path: path, folder: folder });
+    setPath({ path: path, folder: folder });
+    setPreviousName(path.split("/").pop());
   };
 
   const deleteFolder = (path) => {
@@ -259,11 +263,12 @@ const EditorComponent = () => {
     const removedRootName = pathToFile.substring(pathToFile.indexOf("/") + 1);
     const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
 
-    closeTab(removedProjectName);
+    let tab = !(removedProjectName in tabs);
+    if (!tab) closeTab(removedProjectName);
 
     deleteObject(storageRef)
       .then(() => {
-        setDeletedPath({ path: "", folder: false });
+        setPath({ path: "", folder: false });
         updateState(pathToFile);
         setRightClick(false);
       })
@@ -272,8 +277,8 @@ const EditorComponent = () => {
 
   const handleDelete = (e) => {
     e.preventDefault();
-    if (deletedPath.folder) deleteFolder(deletedPath.path);
-    else deleteFile(deletedPath.path);
+    if (path.folder) deleteFolder(path.path);
+    else deleteFile(path.path);
   };
 
   const saveFile = (name, value = null) => {
@@ -290,6 +295,67 @@ const EditorComponent = () => {
     uploadBytes(storageRef, data)
       .then()
       .catch((error) => console.log(error));
+  };
+
+  const renameFolder = (pathToFolder, newPath, oldPath) => {
+    const storageRef = ref(storage, pathToFolder);
+    listAll(storageRef)
+      .then((dir) => {
+        dir.items.forEach((fileRef) => {
+          renameFile(fileRef.fullPath, newPath, oldPath);
+        });
+        dir.prefixes.forEach((folderRef) => renameFolder(folderRef.fullPath, newPath, oldPath));
+      })
+      .catch((error) => console.log(error));
+    deleteFolder(pathToFolder);
+  };
+
+  const renameFile = async (pathToFile, newPath, oldPath) => {
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
+    const removedRootName = pathToFile.substring(pathToFile.indexOf("/") + 1);
+    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
+
+    const path = pathToFile.replace(oldPath, newPath);
+
+    const storageRef = ref(storage, pathToFile);
+    const newStorageRef = ref(storage, path);
+    let content;
+
+    if (documentList.has(removedProjectName)) content = documentList.get(removedProjectName).toString();
+    else
+      await getBytes(storageRef)
+        .then((res) => {
+          content = decoder.decode(res);
+        })
+        .catch((error) => alert(error));
+
+    const saveContent = encoder.encode(content);
+
+    uploadBytes(newStorageRef, saveContent)
+      .then(() => {
+        setPath({ path: "", folder: false });
+        updateState(pathToFile);
+        setRightClick(false);
+      })
+      .catch((error) => alert(error));
+
+    deleteFile(pathToFile);
+  };
+
+  const handleRename = (e) => {
+    e.preventDefault();
+    const oldPath = path.path;
+    const currentPath = oldPath.split("/");
+    currentPath.pop();
+    currentPath.push(renameRef.current.value);
+
+    const newPath = currentPath.join("/");
+    if (path.folder) renameFolder(oldPath, newPath, oldPath);
+    else renameFile(oldPath, newPath, oldPath);
+
+    setRenameModal(false);
   };
 
   useEffect(() => {
@@ -337,40 +403,10 @@ const EditorComponent = () => {
                 <BsFilePlus />
                 New file
               </button>
-              <Modal open={newFileModal} onClose={() => setNewFileModal(false)}>
-                <h2>File name</h2>
-                <form onSubmit={addNewFile}>
-                  <input
-                    type="text"
-                    ref={fileRef}
-                    className={styles.modalInput}
-                    required={true}
-                    placeholder="Give a name for the file"
-                  />
-                  <button type="submit" className={styles.modalButton}>
-                    Create new file
-                  </button>
-                </form>
-              </Modal>
               <button type="button" className={styles.button} onClick={() => setNewFolderModal(true)}>
                 <BsFolderPlus />
                 New folder
               </button>
-              <Modal open={newFolderModal} onClose={() => setNewFolderModal(false)}>
-                <h2>Folder name</h2>
-                <form onSubmit={addNewFolder}>
-                  <input
-                    type="text"
-                    ref={folderRef}
-                    className={styles.modalInput}
-                    required={true}
-                    placeholder="Give a name for the folder"
-                  />
-                  <button type="submit" className={styles.modalButton}>
-                    Create new file
-                  </button>
-                </form>
-              </Modal>
             </div>
             <FileExplorer
               docRef={projectRef}
@@ -418,8 +454,66 @@ const EditorComponent = () => {
           <button type="button" onClick={handleDelete}>
             Delete
           </button>
+          <button type="button" onClick={() => setRenameModal(true)}>
+            Rename
+          </button>
         </div>
       )}
+      <Modal open={newFileModal} onClose={() => setNewFileModal(false)}>
+        <h2>File name</h2>
+        <form onSubmit={addNewFile}>
+          <input
+            type="text"
+            ref={fileNameRef}
+            className={styles.modalInput}
+            required={true}
+            placeholder="Give a name for this file"
+            autoFocus={true}
+          />
+          <button type="submit" className={styles.modalButton}>
+            Create new file
+          </button>
+        </form>
+      </Modal>
+      <Modal open={newFolderModal} onClose={() => setNewFolderModal(false)}>
+        <h2>Folder name</h2>
+        <form onSubmit={addNewFolder}>
+          <input
+            type="text"
+            ref={folderNameRef}
+            className={styles.modalInput}
+            required={true}
+            autoFocus={true}
+            placeholder="Give a name for this folder"
+          />
+          <button type="submit" className={styles.modalButton}>
+            Create new folder
+          </button>
+        </form>
+      </Modal>
+      <Modal
+        open={renameModal}
+        onClose={() => {
+          setRenameModal(false);
+          setRightClick(false);
+        }}
+      >
+        <h2>Rename</h2>
+        <form onSubmit={handleRename}>
+          <input
+            defaultValue={path.path.split("/").pop()}
+            type="text"
+            ref={renameRef}
+            className={styles.modalInput}
+            required={true}
+            autoFocus={true}
+            placeholder="Give a new name"
+          />
+          <button type="submit" className={styles.modalButton}>
+            Rename
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 };

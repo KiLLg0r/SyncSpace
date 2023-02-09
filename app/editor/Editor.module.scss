@@ -199,6 +199,7 @@
   all: unset;
   cursor: pointer;
   background: var(--accent);
+  color: var(--gray-dark-500);
   transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   padding: 0.5rem 0;
   text-align: center;
@@ -212,17 +213,31 @@
 
 .rightClick {
   position: absolute;
+  display: flex;
+  flex-flow: column;
 
   z-index: 100;
 
   button {
     all: unset;
     border-radius: 0.5rem;
-    background: var(--gray-light-100);
+    background: var(--gray-light-200);
+    color: var(--gray-light-600);
     padding: 0.5rem 2rem;
     cursor: pointer;
 
+    &:last-child {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &:nth-child(1) {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
     &:hover {
+      color: var(--gray-light-900);
       background: var(--gray-light-300);
     }
   }
