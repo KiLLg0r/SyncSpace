@@ -1,6 +1,6 @@
 import styles from "./Loading.module.scss";
 
-const Loading = () => {
+const LoadingComponent = () => {
   return (
     <div className={styles.loadingContainer}>
       <div className={styles.loading}>
@@ -38,4 +38,4 @@ const Loading = () => {
   );
 };
 
-export default Loading;
+export default LoadingComponent;

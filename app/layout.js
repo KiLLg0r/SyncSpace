@@ -1,5 +1,6 @@
 import "@styles/globals.css";
 import { AuthProvider } from "@context/AuthContext";
+import Username from "@components/Username/username";
 
 export default function Layout({ children }) {
   return (
@@ -9,7 +10,9 @@ export default function Layout({ children }) {
       </head>
       <body>
         <div>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <Username>{children}</Username>
+          </AuthProvider>
         </div>
       </body>
     </html>

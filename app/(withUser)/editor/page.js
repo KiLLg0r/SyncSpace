@@ -9,7 +9,7 @@ import Editor from "@monaco-editor/react";
 // Yjs imports
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
-import { MonacoBinding } from "../../lib/y-monaco";
+import { MonacoBinding } from "../../../lib/y-monaco";
 
 // Other imports
 import randomColor from "randomcolor";
@@ -17,6 +17,7 @@ const { uniqueNamesGenerator, adjectives, colors, animals, languages } = require
 
 // Styles
 import styles from "./Editor.module.scss";
+import modalStyles from "@components/Modal/Modal.module.scss";
 
 // Icons
 import { BsFolderFill, BsBoxArrowLeft, BsFiles, BsFolderPlus, BsFilePlus } from "react-icons/bs";
@@ -465,12 +466,12 @@ const EditorComponent = () => {
           <input
             type="text"
             ref={fileNameRef}
-            className={styles.modalInput}
+            className={modalStyles.modalInput}
             required={true}
             placeholder="Give a name for this file"
             autoFocus={true}
           />
-          <button type="submit" className={styles.modalButton}>
+          <button type="submit" className={modalStyles.modalButton}>
             Create new file
           </button>
         </form>
@@ -481,12 +482,12 @@ const EditorComponent = () => {
           <input
             type="text"
             ref={folderNameRef}
-            className={styles.modalInput}
+            className={modalStyles.modalInput}
             required={true}
             autoFocus={true}
             placeholder="Give a name for this folder"
           />
-          <button type="submit" className={styles.modalButton}>
+          <button type="submit" className={modalStyles.modalButton}>
             Create new folder
           </button>
         </form>
@@ -504,12 +505,12 @@ const EditorComponent = () => {
             defaultValue={path.path.split("/").pop()}
             type="text"
             ref={renameRef}
-            className={styles.modalInput}
+            className={modalStyles.modalInput}
             required={true}
             autoFocus={true}
             placeholder="Give a new name"
           />
-          <button type="submit" className={styles.modalButton}>
+          <button type="submit" className={modalStyles.modalButton}>
             Rename
           </button>
         </form>

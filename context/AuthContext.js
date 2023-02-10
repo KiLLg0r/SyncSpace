@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,13 +10,9 @@ import {
   updatePassword,
   sendPasswordResetEmail,
   onAuthStateChanged,
-  updateProfile,
 } from "firebase/auth";
 import auth from "@config/firebase";
-import Loading from "@components/Loading/loading";
-import Modal from "@components/Modal/modal";
-import styles from "./AuthContext.module.scss";
-import { useRouter } from "next/navigation";
+import LoadingComponent from "@components/Loading/loading";
 
 const AuthContext = React.createContext();
 
@@ -25,11 +21,9 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState();
-  const usernameRef = useRef(null);
-  const router = useRouter();
 
   function register(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
@@ -72,37 +66,6 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  const changeUsername = (e) => {
-    e.preventDefault();
-    console.log(currentUser);
-    updateProfile(currentUser, {
-      displayName: usernameRef.current.value,
-    }).catch((error) => alert(error));
-    router.back();
-  };
-
-  const Component = ({ currentUser }) => {
-    if (currentUser?.displayName || !currentUser) return children;
-    return (
-      <Modal open={true} disableCloseButton={true}>
-        <h2>Set username</h2>
-        <form onSubmit={changeUsername}>
-          <input
-            type="text"
-            ref={usernameRef}
-            className={styles.modalInput}
-            required={true}
-            autoFocus={true}
-            placeholder="Set your username"
-          />
-          <button type="submit" className={styles.modalButton}>
-            Set username
-          </button>
-        </form>
-      </Modal>
-    );
-  };
-
   const value = {
     currentUser,
     userData,
@@ -118,9 +81,5 @@ export function AuthProvider({ children }) {
     sendUserPasswordResetEmail,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {loading ? <Loading /> : <Component currentUser={currentUser} />}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{loading ? <LoadingComponent /> : children}</AuthContext.Provider>;
 }
