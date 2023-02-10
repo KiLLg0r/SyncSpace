@@ -71,6 +71,14 @@
       min-height: 100vh;
     }
 
+    .featuresLayout {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      align-items: center;
+      min-height: 100vh;
+    }
+
     .rectangle {
       height: 5rem;
       width: 100%;

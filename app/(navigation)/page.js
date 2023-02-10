@@ -1,6 +1,7 @@
 import styles from "./Home.module.scss";
 import Link from "next/link";
-
+import Feature from "@components/Feature/feature";
+import { BsFillBrightnessHighFill } from "react-icons/bs";
 const Home = () => {
   return (
     <div className={styles.home}>
@@ -25,7 +26,26 @@ const Home = () => {
       <div className={styles.features}>
         <div className={`${styles.rectangle} ${styles.rect1}`}></div>
         <main className={styles.content}>
-          <div className={styles.container}></div>
+          <div className={`${styles.container} ${styles.featuresLayout}`}>
+            <Feature
+              title="Ceva"
+              desc="Lorem Ipsum is simplyPageMaker including versions of Lorem Ipsum."
+            >
+              <BsFillBrightnessHighFill />
+            </Feature>
+            <Feature
+              title="Ceva"
+              desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+            >
+              <BsFillBrightnessHighFill />
+            </Feature>
+            <Feature
+              title="Ceva"
+              desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+            >
+              <BsFillBrightnessHighFill />
+            </Feature>
+          </div>
         </main>
         <div className={`${styles.rectangle} ${styles.rect2}`}></div>
       </div>
