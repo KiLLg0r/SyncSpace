@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import styles from "./Login.module.scss";
+import styles from "./Register.module.scss";
 import { HiOutlineMail } from "react-icons/hi";
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiLock } from "react-icons/bi";
@@ -10,17 +10,23 @@ import { BsGoogle } from "react-icons/bs";
 import { useAuth } from "@context/AuthContext";
 import { useRouter } from "next/navigation";
 
-function Login() {
-  const { login } = useAuth();
+function Register() {
+  const { register } = useAuth();
   const router = useRouter();
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (passwordRef.current.value !== confirmPasswordRef.current.value) {
+      alert("Password do not match");
+      return;
+    }
+
     try {
-      await login(emailRef?.current?.value, passwordRef?.current?.value);
+      await register(emailRef?.current?.value, passwordRef?.current?.value);
       router.push("/");
     } catch (error) {
       alert(error);
@@ -35,8 +41,8 @@ function Login() {
             <GiRingedPlanet />
           </div>
           <div className={styles["login-card-header"]}>
-            <h1>Sign In</h1>
-            <div>Please login to use platform</div>
+            <h1>Create Account</h1>
+            <div>Please register to use platform</div>
           </div>
           <form className={styles["login-card-form"]} onSubmit={handleSubmit}>
             <div className={styles["form-item"]}>
@@ -58,22 +64,23 @@ function Login() {
                 ref={passwordRef}
               />
             </div>
-            <div className={styles["form-item-other"]}>
-              <div className={styles.checkbox}>
-                <input type="checkbox" id="rememberMeCheckbox" />
-                <label htmlFor="rememberMeCheckbox">Remember me</label>
-              </div>
-              <a href="#">I forgot my password!</a>
+            <div className={styles["form-item"]}>
+              <BiLock className={styles["form-item-icon"]} />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                required
+                ref={confirmPasswordRef}
+              />
             </div>
-            <button type="submit">Sign In</button>
+            <button type="submit">Sign Up</button>
           </form>
           <div className={styles["login-card-footer"]}>
-            Don&apos;t have an account?{" "}
-            <a href="../create-new-account">Create a free account</a>
+            Already have an account? <a href="../login">Log in here!</a>
           </div>
         </div>
         <div className={styles["login-card-social"]}>
-          <div>Other Sign-in Platform</div>
+          <div>You can also sign up through</div>
           <div className={styles["login-card-social-btn"]}>
             <a href="#">
               <BsFacebook />
@@ -88,4 +95,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;
