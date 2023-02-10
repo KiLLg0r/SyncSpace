@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BsX } from "react-icons/bs";
 import styles from "./Modal.module.scss";
 
-const Modal = ({ children, onClose, open }) => {
+const Modal = ({ children, onClose, open, disableCloseButton = false }) => {
   useEffect(() => {
     if (open) {
       document.body.classList.remove("closed");
@@ -21,7 +21,7 @@ const Modal = ({ children, onClose, open }) => {
         <div className={styles.modalBackground} onClick={onClose}></div>
         <div className={styles.modalContent}>
           <div className={styles.header}>
-            <BsX onClick={onClose} />
+            {!disableCloseButton && <BsX onClick={onClose} />}
           </div>
           {children}
         </div>
