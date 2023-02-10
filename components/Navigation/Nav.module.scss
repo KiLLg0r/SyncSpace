@@ -66,10 +66,21 @@
   }
 
   .right {
-    .dropdown{
+    .login {
+      background: var(--accent);
+      color: var(--gray-dark-800);
+      padding: 0.75rem 1.5rem;
+      border-radius: 1rem;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+      &:hover {
+        background: var(--accent-dark);
+      }
+    }
+    .dropdown {
       position: relative;
 
-      button{
+      button {
         display: flex;
         align-items: center;
         gap: 0.625rem;
@@ -85,19 +96,19 @@
       }
     }
 
-    .dropdown > button{
+    .dropdown > button {
       position: relative;
       z-index: 2;
       background: var(--gray-light-100);
       transition: 0.3s;
     }
 
-    .menu{
+    .menu {
       position: absolute;
       overflow: hidden;
       z-index: 1;
       width: 100%;
-      height: 8rem;
+      height: 10rem;
       opacity: 0;
       transform-origin: 85% 0%;
       scale: 0;
@@ -107,7 +118,7 @@
       transition: 0.4s;
     }
 
-    .dropdown.open .menu{
+    .dropdown.open .menu {
       scale: 1;
       right: 0;
       top: 4.5rem;
@@ -115,23 +126,36 @@
       visibility: visible;
     }
 
-    .menu button{
+    .menu button {
       border: 0;
       width: 100%;
       height: 2rem;
       border-radius: 0;
+
+      &:last-child {
+        background: var(--red);
+
+        &:hover {
+          background: var(--red-dark);
+        }
+      }
+
+      span {
+        display: grid;
+        place-items: center;
+      }
     }
 
-    .menu button:hover{
+    .menu button:hover {
       background: var(--gray-dark-100);
     }
 
-    .chevron{
+    .chevron {
       margin-left: auto;
       transition: 0.4s;
     }
 
-    .dropdown.open .chevron{
+    .dropdown.open .chevron {
       rotate: -180deg;
     }
   }
