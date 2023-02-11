@@ -1,5 +1,4 @@
 const validateError = (errorCode) => {
-  const language = localStorage.getItem("language");
   switch (errorCode) {
     case "auth/invalid-email":
       return {

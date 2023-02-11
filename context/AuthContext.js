@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState();
 
-  function register(email, password) {
+  function createAccount(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
   }
 
@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
     userData,
     setCurrentUser,
     setUserData,
-    register,
+    createAccount,
     login,
     logout,
     resetPassword,

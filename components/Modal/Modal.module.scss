@@ -45,6 +45,10 @@
   margin-block: 1rem;
   text-indent: 0.5rem;
 
+  &:invalid {
+    outline: 2px solid var(--red);
+  }
+
   &:focus {
     outline: 2px solid var(--accent);
   }

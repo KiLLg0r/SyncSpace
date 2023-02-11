@@ -18,6 +18,7 @@ const { uniqueNamesGenerator, adjectives, colors, animals, languages } = require
 // Styles
 import styles from "./Editor.module.scss";
 import modalStyles from "@components/Modal/Modal.module.scss";
+import errorStyles from "@styles/Error.module.css";
 
 // Icons
 import { BsFolderFill, BsBoxArrowLeft, BsFiles, BsFolderPlus, BsFilePlus } from "react-icons/bs";
@@ -34,6 +35,12 @@ import { storage } from "@config/firebase";
 
 // Utils
 import { getLanguage } from "@utils/languages";
+
+// React hooks form
+import { useForm } from "react-hook-form";
+
+// Animation
+import { motion, AnimatePresence } from "framer-motion";
 
 let ydocument = new Y.Doc();
 let documentList = ydocument.getMap("project-files");
@@ -56,12 +63,26 @@ const EditorComponent = () => {
   const [rightClick, setRightClick] = useState(false);
   const [xy, setXY] = useState({ x: 0, y: 0 });
   const [path, setPath] = useState({ path: "", folder: false });
-  const [previousName, setPreviousName] = useState("");
+
+  const {
+    register: registerFile,
+    handleSubmit: handleSubmitFile,
+    formState: { errors: errorsFile },
+  } = useForm();
+
+  const {
+    register: registerFolder,
+    handleSubmit: handleSubmitFolder,
+    formState: { errors: errorsFolder },
+  } = useForm();
+
+  const {
+    register: registerRename,
+    handleSubmit: handleSubmitRename,
+    formState: { errors: errorsRename },
+  } = useForm();
 
   const tabsContainerRef = useRef(null);
-  const folderNameRef = useRef(null);
-  const fileNameRef = useRef(null);
-  const renameRef = useRef(null);
 
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
@@ -188,10 +209,10 @@ const EditorComponent = () => {
     tabsContainer.scrollLeft += e.deltaY;
   };
 
-  const addNewFolder = (e) => {
+  const addNewFolder = (data, e) => {
     e.preventDefault();
 
-    const folderName = folderNameRef.current.value;
+    const folderName = data.folder;
     const initialLength = focus.path.length;
 
     const checkForFile = focus.path.split(".").pop();
@@ -209,10 +230,10 @@ const EditorComponent = () => {
     });
   };
 
-  const addNewFile = (e) => {
+  const addNewFile = (data, e) => {
     e.preventDefault();
 
-    const fileName = fileNameRef.current.value;
+    const fileName = data.file;
     const initialLength = focus.path.length;
 
     const checkForFile = focus.path.split(".").pop();
@@ -246,7 +267,6 @@ const EditorComponent = () => {
     setXY(coord);
     setRightClick(true);
     setPath({ path: path, folder: folder });
-    setPreviousName(path.split("/").pop());
   };
 
   const deleteFolder = (path) => {
@@ -345,12 +365,12 @@ const EditorComponent = () => {
     deleteFile(pathToFile);
   };
 
-  const handleRename = (e) => {
+  const handleRename = (data, e) => {
     e.preventDefault();
     const oldPath = path.path;
     const currentPath = oldPath.split("/");
     currentPath.pop();
-    currentPath.push(renameRef.current.value);
+    currentPath.push(data.rename);
 
     const newPath = currentPath.join("/");
     if (path.folder) renameFolder(oldPath, newPath, oldPath);
@@ -374,6 +394,8 @@ const EditorComponent = () => {
 
     return () => clearInterval(save);
   }, [tabs]);
+
+  console.log(errorsFile, errorsFolder, errorsRename);
 
   return (
     <div className={styles.editor}>
@@ -462,15 +484,39 @@ const EditorComponent = () => {
       )}
       <Modal open={newFileModal} onClose={() => setNewFileModal(false)}>
         <h2>File name</h2>
-        <form onSubmit={addNewFile}>
+        <form onSubmit={handleSubmitFile(addNewFile)}>
           <input
             type="text"
-            ref={fileNameRef}
             className={modalStyles.modalInput}
-            required={true}
             placeholder="Give a name for this file"
             autoFocus={true}
+            aria-invalid={errorsFile.file ? "true" : "false"}
+            {...registerFile("file", { required: true, pattern: /^[\w,\s-]+\.[A-Za-z]{2,4}$/i })}
           />
+          <AnimatePresence>
+            {errorsFile.file?.type === "required" && (
+              <motion.p
+                role="alert"
+                className={errorStyles.error}
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+              >
+                The file name is required
+              </motion.p>
+            )}
+            {errorsFile.file?.type === "pattern" && (
+              <motion.p
+                role="alert"
+                className={errorStyles.error}
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+              >
+                The given name is not a file
+              </motion.p>
+            )}
+          </AnimatePresence>
           <button type="submit" className={modalStyles.modalButton}>
             Create new file
           </button>
@@ -478,15 +524,28 @@ const EditorComponent = () => {
       </Modal>
       <Modal open={newFolderModal} onClose={() => setNewFolderModal(false)}>
         <h2>Folder name</h2>
-        <form onSubmit={addNewFolder}>
+        <form onSubmit={handleSubmitFolder(addNewFolder)}>
           <input
             type="text"
-            ref={folderNameRef}
             className={modalStyles.modalInput}
-            required={true}
             autoFocus={true}
             placeholder="Give a name for this folder"
+            aria-invalid={errorsFolder.folder ? "true" : "false"}
+            {...registerFolder("folder", { required: true })}
           />
+          <AnimatePresence>
+            {errorsFolder.folder?.type === "required" && (
+              <motion.p
+                role="alert"
+                className={errorStyles.error}
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+              >
+                The folder name is required
+              </motion.p>
+            )}
+          </AnimatePresence>
           <button type="submit" className={modalStyles.modalButton}>
             Create new folder
           </button>
@@ -500,16 +559,40 @@ const EditorComponent = () => {
         }}
       >
         <h2>Rename</h2>
-        <form onSubmit={handleRename}>
+        <form onSubmit={handleSubmitRename(handleRename)}>
           <input
             defaultValue={path.path.split("/").pop()}
             type="text"
-            ref={renameRef}
             className={modalStyles.modalInput}
-            required={true}
             autoFocus={true}
             placeholder="Give a new name"
+            aria-invalid={errorsRename.rename ? "true" : "false"}
+            {...registerRename("rename", { required: true })}
           />
+          <AnimatePresence>
+            {errorsRename.rename?.type === "required" && (
+              <motion.p
+                role="alert"
+                className={errorStyles.error}
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+              >
+                A new name is required
+              </motion.p>
+            )}
+            {errorsRename.rename?.type === "custom" && (
+              <motion.p
+                role="alert"
+                className={errorStyles.error}
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+              >
+                {errorsRename.rename?.message}
+              </motion.p>
+            )}
+          </AnimatePresence>
           <button type="submit" className={modalStyles.modalButton}>
             Rename
           </button>
