@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import auth from "@config/firebase";
 import LoadingComponent from "@components/Loading/loading";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AuthContext = React.createContext();
 
@@ -81,5 +82,17 @@ export function AuthProvider({ children }) {
     sendUserPasswordResetEmail,
   };
 
-  return <AuthContext.Provider value={value}>{loading ? <LoadingComponent /> : children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <AnimatePresence>
+        {loading ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <LoadingComponent />
+          </motion.div>
+        ) : (
+          children
+        )}
+      </AnimatePresence>
+    </AuthContext.Provider>
+  );
 }
