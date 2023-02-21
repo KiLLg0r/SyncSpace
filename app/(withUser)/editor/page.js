@@ -24,10 +24,10 @@ import errorStyles from "@styles/Error.module.css";
 import { BsFolderFill, BsBoxArrowLeft, BsFiles, BsFolderPlus, BsFilePlus } from "react-icons/bs";
 
 // Components
-import FileExplorer from "@components/File explorer/fileExplorer";
-import Tab from "@components/Tab/tab";
-import Loading from "@components/Loading/loading";
-import Modal from "@components/Modal/modal";
+import FileExplorer from "@components/File explorer";
+import Tab from "@components/Tab";
+import Loading from "@components/Loading";
+import Modal from "@components/Modal";
 
 // Firebase
 import { ref, getBytes, uploadString, deleteObject, listAll, uploadBytes } from "firebase/storage";

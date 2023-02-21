@@ -1,5 +1,6 @@
 "use client";
 
+// Icons
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiSearchAlt } from "react-icons/bi";
 import {
@@ -10,27 +11,33 @@ import {
   BsFillFolderFill,
   BsPersonCircle,
 } from "react-icons/bs";
-import styles from "./Nav.module.scss";
-import { useRef, useState } from "react";
-import { useAuth } from "@context/AuthContext";
 import { FaCog } from "react-icons/fa";
+
+// Styles
+import styles from "./Nav.module.scss";
+
+// React / Next
+import { useRef, useState } from "react";
 import Link from "next/link";
+
+// Auth store
+import authStore from "@store/authStore";
 
 const Navigation = () => {
   const buttonRef = useRef(null);
   const chevronRef = useRef(null);
   const menuRef = useRef(null);
   const dropdownRef = useRef(null);
+
   const [open, setOpen] = useState(false);
-  const { currentUser, logout } = useAuth();
+
+  const currentUser = authStore((state) => state.currentUser);
+  const logout = authStore((state) => state.logout);
 
   const toggleDropdown = () => {
-    let menuTop =
-      chevronRef?.current?.getBoundingClientRect()?.top -
-      buttonRef?.current?.getBoundingClientRect()?.top;
+    let menuTop = chevronRef?.current?.getBoundingClientRect()?.top - buttonRef?.current?.getBoundingClientRect()?.top;
     let menuRight =
-      chevronRef?.current?.getBoundingClientRect()?.right -
-      buttonRef?.current?.getBoundingClientRect()?.right;
+      chevronRef?.current?.getBoundingClientRect()?.right - buttonRef?.current?.getBoundingClientRect()?.right;
     if (open) {
       menuRef.current.style.top = `${menuTop}px`;
       menuRef.current.style.right = `${menuRight}px`;
@@ -43,12 +50,14 @@ const Navigation = () => {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.left}>
-        <GiRingedPlanet />
-        <div className={styles.name}>
-          <span>Sync</span>Space
+      <Link href="/">
+        <div className={styles.left}>
+          <GiRingedPlanet />
+          <div className={styles.name}>
+            <span>Sync</span>Space
+          </div>
         </div>
-      </div>
+      </Link>
       <div className={styles.center}>
         <div className={styles.search}>
           <input type="text" placeholder="Search for projects..." />
@@ -63,10 +72,7 @@ const Navigation = () => {
             Log in
           </Link>
         ) : (
-          <div
-            className={`${styles.dropdown} ${open && styles.open}`}
-            ref={dropdownRef}
-          >
+          <div className={`${styles.dropdown} ${open && styles.open}`} ref={dropdownRef}>
             <button ref={buttonRef} onClick={toggleDropdown}>
               <BsFillPersonFill />
               {currentUser?.displayName}

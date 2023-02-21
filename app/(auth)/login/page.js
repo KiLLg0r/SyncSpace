@@ -14,8 +14,8 @@ import { GiRingedPlanet } from "react-icons/gi";
 import { BiLock } from "react-icons/bi";
 import { BsFacebook, BsGoogle } from "react-icons/bs";
 
-// Auth context
-import { useAuth } from "@context/AuthContext";
+// Auth store
+import authStore from "@store/authStore";
 
 // React hooks form
 import { useForm } from "react-hook-form";
@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import validateError from "@utils/errors";
 
 function Login() {
-  const { login } = useAuth();
+  const login = authStore((state) => state.login);
   const router = useRouter();
 
   const {

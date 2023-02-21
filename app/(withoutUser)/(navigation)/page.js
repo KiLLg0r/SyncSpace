@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Home.module.scss";
-import Feature from "@components/Feature/feature";
+import Feature from "@components/Feature";
 import { BsFillBrightnessHighFill } from "react-icons/bs";
 import { motion } from "framer-motion";
 

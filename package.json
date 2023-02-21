@@ -25,7 +25,8 @@
     "sass": "^1.57.1",
     "unique-names-generator": "^4.7.1",
     "y-webrtc": "^10.2.3",
-    "yjs": "^13.5.44"
+    "yjs": "^13.5.44",
+    "zustand": "^4.3.3"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.5.1",

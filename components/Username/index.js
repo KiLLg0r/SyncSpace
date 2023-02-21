@@ -1,10 +1,10 @@
 "use client";
 
 // Auth context
-import { useAuth } from "@context/AuthContext";
+import authStore from "@store/authStore";
 
 // Components
-import Modal from "@components/Modal/modal";
+import Modal from "@components/Modal";
 
 // Styles
 import styles from "@components/Modal/Modal.module.scss";
@@ -30,7 +30,7 @@ import { db } from "@config/firebase";
 import { useState } from "react";
 
 const Username = ({ children }) => {
-  const { currentUser } = useAuth();
+  const currentUser = authStore((state) => state.currentUser);
   const router = useRouter();
   const [openModal, setOpenModal] = useState(true);
 

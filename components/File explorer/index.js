@@ -1,7 +1,7 @@
 // React
 import React, { useEffect, useState } from "react";
 import { listAll } from "firebase/storage";
-import { File, Folder } from "@components/File/file";
+import { File, Folder } from "@components/File";
 
 const FolderTree = ({ docRef, onClick, focusedItem, rightClick }) => {
   const [docs, setDocs] = useState(null);

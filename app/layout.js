@@ -1,17 +1,27 @@
 "use client";
 
+// Styles
 import "@styles/globals.css";
-import { AuthProvider } from "@context/AuthContext";
-import Username from "@components/Username/username";
+
+// Components
+import Username from "@components/Username";
+import LoadingComponent from "@components/Loading";
+import AuthChange from "@components/Auth change";
+
+// React
 import { useState, useEffect } from "react";
-import LoadingComponent from "@components/Loading/loading";
+
+// Framer motion
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Layout({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(false);
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
@@ -21,16 +31,20 @@ export default function Layout({ children }) {
       </head>
       <body>
         <div>
-          <AuthProvider>
-            <AnimatePresence>
+          <AuthChange>
+            <AnimatePresence key={"pageTransition"}>
               {loading && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
                   <LoadingComponent />
                 </motion.div>
               )}
             </AnimatePresence>
             <Username>{children}</Username>
-          </AuthProvider>
+          </AuthChange>
         </div>
       </body>
     </html>

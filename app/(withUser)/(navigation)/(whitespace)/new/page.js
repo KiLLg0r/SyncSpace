@@ -13,8 +13,8 @@ import { BsLockFill, BsPeopleFill } from "react-icons/bs";
 import styles from "./New.module.scss";
 import errorStyles from "@styles/Error.module.css";
 
-// Auth context
-import { useAuth } from "@context/AuthContext";
+// Auth store
+import authStore from "@store/authStore";
 
 // React hooks form
 import { useForm } from "react-hook-form";
@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const New = () => {
   const router = useRouter();
 
-  const { currentUser } = useAuth();
+  const currentUser = authStore((state) => state.currentUser);
 
   const {
     register,

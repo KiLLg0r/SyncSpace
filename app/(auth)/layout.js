@@ -1,23 +1,19 @@
 "use client";
 
+// Styles
 import "@styles/globals.css";
-import { useAuth } from "@context/AuthContext";
+
+// Auth store
+import authStore from "@store/authStore";
+
+// Navigation
 import { useRouter } from "next/navigation";
-import LoadingComponent from "@components/Loading/loading";
-import { motion } from "framer-motion";
 
 export default function Layout({ children }) {
-  const { currentUser } = useAuth();
+  const currentUser = authStore((state) => state.currentUser);
   const router = useRouter();
 
-  if (currentUser) {
-    router.replace("/");
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-        <LoadingComponent />
-      </motion.div>
-    );
-  }
+  if (currentUser) router.replace("/");
 
   return children;
 }
