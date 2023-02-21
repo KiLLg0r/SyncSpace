@@ -20,9 +20,18 @@ const authStore = create((set) => ({
   login: (email, password) => signInWithEmailAndPassword(auth, email, password),
   logout: () => signOut(auth),
   resetPassword: (email) => auth.sendPasswordResetEmail(email),
-  updateUserEmail: (email) => updateEmail(currentUser, email),
-  updateUserPassword: (password) => updatePassword(currentUser, password),
-  sendUserEmailVerification: () => sendEmailVerification(currentUser),
+  updateUserEmail: (email) => {
+    const user = get().currentUser;
+    updateEmail(user, email);
+  },
+  updateUserPassword: (password) => {
+    const user = get().currentUser;
+    updatePassword(user, password);
+  },
+  sendUserEmailVerification: () => {
+    const user = get().currentUser;
+    sendEmailVerification(user);
+  },
   sendUserPasswordResetEmail: (email) => sendPasswordResetEmail(auth, email),
   updateUser: (user) => set({ currentUser: user }),
   updateUserData: (data) => set({ userData: data }),

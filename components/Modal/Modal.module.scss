@@ -42,7 +42,6 @@
   color: var(--foreground);
   border-radius: 0.5rem;
   border: none;
-  margin-block: 1rem;
   text-indent: 0.5rem;
 
   &:invalid {
@@ -69,6 +68,7 @@
   text-align: center;
   border-radius: 0.5rem;
   width: 100%;
+  margin-top: 1rem;
 
   &:hover {
     background: var(--accent-dark);

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { listAll } from "firebase/storage";
 import { File, Folder } from "@components/File";
+import styles from "../File/File.module.scss";
 
 const FolderTree = ({ docRef, onClick, focusedItem, rightClick }) => {
   const [docs, setDocs] = useState(null);
@@ -49,7 +50,11 @@ const FolderTree = ({ docRef, onClick, focusedItem, rightClick }) => {
 };
 
 const FileExplorer = ({ docRef, onClick, focusedItem, rightClick }) => {
-  return <FolderTree docRef={docRef} onClick={onClick} focusedItem={focusedItem} rightClick={rightClick} />;
+  return (
+    <div className={styles.container}>
+      <FolderTree docRef={docRef} onClick={onClick} focusedItem={focusedItem} rightClick={rightClick} />
+    </div>
+  );
 };
 
 export default React.memo(FileExplorer);

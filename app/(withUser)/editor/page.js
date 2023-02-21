@@ -9,11 +9,10 @@ import Editor from "@monaco-editor/react";
 // Yjs imports
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
-import { MonacoBinding } from "../../../lib/y-monaco";
+import { MonacoBinding } from "@lib/y-monaco";
 
 // Other imports
 import randomColor from "randomcolor";
-const { uniqueNamesGenerator, adjectives, colors, animals, languages } = require("unique-names-generator");
 
 // Styles
 import styles from "./Editor.module.scss";
@@ -42,6 +41,9 @@ import { useForm } from "react-hook-form";
 // Animation
 import { motion, AnimatePresence } from "framer-motion";
 
+// Auth store
+import authStore from "@store/authStore";
+
 let ydocument = new Y.Doc();
 let documentList = ydocument.getMap("project-files");
 let monacoEditor = null;
@@ -63,6 +65,8 @@ const EditorComponent = () => {
   const [rightClick, setRightClick] = useState(false);
   const [xy, setXY] = useState({ x: 0, y: 0 });
   const [path, setPath] = useState({ path: "", folder: false });
+  const currentUser = authStore((state) => state.currentUser);
+  const tabsContainerRef = useRef(null);
 
   const {
     register: registerFile,
@@ -82,8 +86,6 @@ const EditorComponent = () => {
     formState: { errors: errorsRename },
   } = useForm();
 
-  const tabsContainerRef = useRef(null);
-
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
     monacoInstance = monaco;
@@ -97,12 +99,9 @@ const EditorComponent = () => {
         awareness = provider.awareness;
 
         const randomcolor = randomColor();
-        const randomName = uniqueNamesGenerator({
-          dictionaries: [adjectives, colors, animals],
-        });
 
         awareness.setLocalStateField("user", {
-          name: randomName,
+          name: currentUser.displayName,
           color: randomcolor,
         });
 
@@ -118,7 +117,7 @@ const EditorComponent = () => {
         }
       };
     }
-  }, [editorRef]);
+  }, [currentUser, editorRef]);
 
   const bindEditor = (ytext) => {
     if (monacoBinding) monacoBinding.destroy();

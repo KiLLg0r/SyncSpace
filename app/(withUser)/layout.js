@@ -1,8 +1,5 @@
 "use client";
 
-// Styles
-import "@styles/globals.css";
-
 // Auth store
 import authStore from "@store/authStore";
 
