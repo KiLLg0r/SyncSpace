@@ -5,6 +5,8 @@
   --accent-dark: #c56900;
   --red: #c92b2b;
   --red-dark: #841c1c;
+  --green: #17c964;
+  --green-dark: #0a6130;
   --background: var(--gray);
   --foreground: var(--gray-light-900);
   --gray-dark-900: #040405;
@@ -38,8 +40,8 @@
 
 html,
 body {
-  max-width: 100vw;
   height: 100%;
+  width: 100%;
   overflow-x: hidden;
 }
 

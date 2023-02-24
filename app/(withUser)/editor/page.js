@@ -71,18 +71,21 @@ const EditorComponent = () => {
   const {
     register: registerFile,
     handleSubmit: handleSubmitFile,
+    reset: resetFile,
     formState: { errors: errorsFile },
   } = useForm();
 
   const {
     register: registerFolder,
     handleSubmit: handleSubmitFolder,
+    reset: resetFolder,
     formState: { errors: errorsFolder },
   } = useForm();
 
   const {
     register: registerRename,
     handleSubmit: handleSubmitRename,
+    reset: resetRename,
     formState: { errors: errorsRename },
   } = useForm();
 
@@ -481,7 +484,13 @@ const EditorComponent = () => {
           </button>
         </div>
       )}
-      <Modal open={newFileModal} onClose={() => setNewFileModal(false)}>
+      <Modal
+        open={newFileModal}
+        onClose={() => {
+          resetFile();
+          setNewFileModal(false);
+        }}
+      >
         <h2>File name</h2>
         <form onSubmit={handleSubmitFile(addNewFile)}>
           <input
@@ -521,7 +530,13 @@ const EditorComponent = () => {
           </button>
         </form>
       </Modal>
-      <Modal open={newFolderModal} onClose={() => setNewFolderModal(false)}>
+      <Modal
+        open={newFolderModal}
+        onClose={() => {
+          resetFolder();
+          setNewFolderModal(false);
+        }}
+      >
         <h2>Folder name</h2>
         <form onSubmit={handleSubmitFolder(addNewFolder)}>
           <input
@@ -553,6 +568,7 @@ const EditorComponent = () => {
       <Modal
         open={renameModal}
         onClose={() => {
+          resetRename();
           setRenameModal(false);
           setRightClick(false);
         }}
