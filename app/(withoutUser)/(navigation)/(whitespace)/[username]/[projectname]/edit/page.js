@@ -2,6 +2,7 @@
 // Next / Reacts imports
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Monaco Editor import
 import Editor from "@monaco-editor/react";
@@ -52,12 +53,12 @@ let provider = null;
 let awareness = null;
 let monacoBinding = null;
 
-const EditorComponent = () => {
+const EditorComponent = ({ params }) => {
   const [code, setCode] = useState("");
   const [editorRef, setEditorRef] = useState(null);
-  const [projectRef, setProjectRef] = useState(ref(storage, "projects/SyncSpace"));
+  const [projectRef, setProjectRef] = useState(ref(storage, `users/${params.username}/${params.projectname}/`));
   const [tabs, setTabs] = useState({});
-  const [focus, setFocus] = useState({ path: "projects/SyncSpace/" });
+  const [focus, setFocus] = useState({ path: `users/${params.username}/${params.projectname}/` });
   const [newUpdate, updateState] = useState();
   const [newFileModal, setNewFileModal] = useState(false);
   const [newFolderModal, setNewFolderModal] = useState(false);
@@ -67,6 +68,7 @@ const EditorComponent = () => {
   const [path, setPath] = useState({ path: "", folder: false });
   const currentUser = authStore((state) => state.currentUser);
   const tabsContainerRef = useRef(null);
+  const router = useRouter();
 
   const {
     register: registerFile,
@@ -94,6 +96,9 @@ const EditorComponent = () => {
     monacoInstance = monaco;
     setEditorRef(editor);
   };
+
+  if (!currentUser || params.username !== currentUser?.displayName)
+    router.replace(`/${params.username}/${params.projectname}/`);
 
   useEffect(() => {
     if (editorRef) {
@@ -405,10 +410,10 @@ const EditorComponent = () => {
       <header className={styles.header}>
         <div className={styles.leftSide}>
           <BsFolderFill className={styles.icon} />
-          Project name
+          {params.projectname}
         </div>
         <div className={styles.rightSide}>
-          <Link href="/">
+          <Link href={`/${params.username}/${params.projectname}`}>
             Exit editing <BsBoxArrowLeft />
           </Link>
         </div>
@@ -422,7 +427,13 @@ const EditorComponent = () => {
               Files
             </label>
           </nav>
-          <div className={styles.files}>
+          <div
+            className={styles.files}
+            onClick={(e) => {
+              e.preventDefault();
+              if (e.target === e.currentTarget) setFocus({ path: `users/${params.username}/${params.projectname}/` });
+            }}
+          >
             <div className={styles.actionButtons}>
               <button type="button" className={styles.button} onClick={() => setNewFileModal(true)}>
                 <BsFilePlus />
@@ -469,7 +480,6 @@ const EditorComponent = () => {
               value={code}
               onChange={setCode}
               onMount={handleEditorDidMount}
-              className={styles.editor}
             />
           </div>
         </section>

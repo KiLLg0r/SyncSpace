@@ -2,6 +2,10 @@
 
 // Nagivation
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+// Monaco Editor import
+import Editor from "@monaco-editor/react";
 
 // Styles
 import styles from "./Project.module.scss";
@@ -10,7 +14,7 @@ import modal from "@components/Modal/Modal.module.scss";
 // Firebase
 import { doc, getDoc } from "firebase/firestore";
 import { db, storage } from "@config/firebase";
-import { ref, list, uploadBytes } from "firebase/storage";
+import { ref, list, uploadBytes, getBytes } from "firebase/storage";
 
 // Auth store
 import authStore from "@store/authStore";
@@ -29,16 +33,25 @@ import "react-toastify/dist/ReactToastify.css";
 // SVG
 import Empty from "@public/empty.svg";
 
+// Utils
+import { getLanguage } from "@utils/languages";
+
 const Project = ({ params }) => {
   const currentUser = authStore((state) => state.currentUser);
   const router = useRouter();
 
+  const [code, setCode] = useState("");
+  const [language, setLanguage] = useState("");
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [confirmUpload, setConfirmUpload] = useState(false);
   const [projectData, setProjectData] = useState(0);
   const [hasFiles, setHasFiles] = useState(false);
   const [supportFileSystemAccessAPI, setSupportFileSystemAccessAPI] = useState(null);
+  const [focus, setFocus] = useState({ path: `users/${params.username}/${params.projectname}/` });
+  const [showEditor, setShowEditor] = useState(false);
+  const [editorRef, setEditorRef] = useState(null);
+  const [monacoRef, setMonacoRef] = useState(null);
 
   const inputRef = useRef(null);
 
@@ -55,6 +68,11 @@ const Project = ({ params }) => {
     ".vercel",
     ".DS_Store",
   ];
+
+  const handleEditorDidMount = (editor, monaco) => {
+    setMonacoRef(monaco);
+    setEditorRef(editor);
+  };
 
   useEffect(() => {
     const getProjectData = async (path) => {
@@ -85,7 +103,10 @@ const Project = ({ params }) => {
 
   const getFiles = async (directoryHandle, path = "") => {
     for await (const entry of directoryHandle.values()) {
-      if (!ignoreFilesAndFolders.some((ignore) => path.includes(ignore)))
+      if (
+        !ignoreFilesAndFolders.some((ignore) => path.includes(ignore)) ||
+        !ignoreFilesAndFolders.some((ignore) => entry.name.includes(ignore))
+      )
         if (entry.kind === "directory") await getFiles(entry, `${path}/${entry.name}`);
         else {
           const fileObj = await entry.getFile();
@@ -223,8 +244,28 @@ const Project = ({ params }) => {
       pending: "The folder is being uploaded",
       success: "Folder uploaded successfully 👌",
       error: "The folder could not be uploaded 🤯",
-      onClose: () => router.refresh(),
     });
+  };
+
+  const fileClick = async (docRef, folder = false) => {
+    if (folder) {
+      setFocus({ path: docRef.fullPath });
+      return;
+    }
+
+    const fileExtension = docRef.name.split(".").pop();
+    const fileLanguage = getLanguage(fileExtension);
+
+    setFocus({ path: docRef.fullPath });
+
+    await getBytes(docRef)
+      .then((res) => {
+        const decoder = new TextDecoder();
+        setLanguage(fileLanguage);
+        setCode(decoder.decode(res));
+        setShowEditor(true);
+      })
+      .catch((error) => alert(error));
   };
 
   if (
@@ -251,7 +292,12 @@ const Project = ({ params }) => {
       <main className={styles.content}>
         <div className={styles.code}>
           {hasFiles ? (
-            <FileExplorer docRef={ref(storage, `users/${params.username}/${params.projectname}`)} />
+            <FileExplorer
+              docRef={ref(storage, `users/${params.username}/${params.projectname}`)}
+              onClick={fileClick}
+              focusedItem={focus.path}
+              rightClick={() => {}}
+            />
           ) : (
             <div className={styles.noFiles}>
               <Empty />
@@ -306,10 +352,27 @@ const Project = ({ params }) => {
               )}
             </form>
           )}
+          <div style={{ display: !showEditor && "none" }}>
+            <Editor
+              height="100vh"
+              width="100%"
+              theme="vs-dark"
+              value={code}
+              language={language}
+              onChange={setCode}
+              onMount={handleEditorDidMount}
+              options={{ readOnly: true }}
+              className={styles.editor}
+            />
+          </div>
         </div>
         <div className={styles.line}></div>
         <aside className={styles.aside}>
-          <div className={styles.editBtn}>Edit project</div>
+          {currentUser?.displayName === projectData?.owner && (
+            <Link href={`/${params.username}/${params.projectname}/edit`} className={styles.editBtn}>
+              Edit project
+            </Link>
+          )}
           <div className={styles.item}>
             <div className={styles.label}>Owner</div>
             <div className={styles.value}>{projectData?.owner}</div>

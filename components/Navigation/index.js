@@ -81,34 +81,24 @@ const Navigation = () => {
               </div>
             </button>
             <div ref={menuRef} className={styles.menu}>
-              <button>
-                <span>
-                  <BsPersonCircle />
-                </span>
-                Profile
-              </button>
-              <button>
-                <span>
+              <Link href={`/${currentUser?.displayName}`} className={styles.menuItem}>
+                <button>
                   <BsFillFolderFill />
-                </span>
-                Projetcs
-              </button>
-              <button>
-                <span>
-                  <BsFillChatFill />
-                </span>
+                  Projects
+                </button>
+              </Link>
+              <button className={styles.menuItem}>
+                <BsFillChatFill />
                 Chat
               </button>
-              <button>
-                <span>
+              <Link href="/settings" className={styles.menuItem}>
+                <button>
                   <FaCog />
-                </span>
-                Settings
-              </button>
-              <button onClick={logout}>
-                <span>
-                  <BsBoxArrowLeft />
-                </span>
+                  Settings
+                </button>
+              </Link>
+              <button onClick={logout} className={styles.menuItem}>
+                <BsBoxArrowLeft />
                 Log Out
               </button>
             </div>

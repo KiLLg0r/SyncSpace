@@ -34,10 +34,11 @@ const New = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    await setDoc(doc(db, `projects/${currentUser.displayName}`, data.projectName), {
+    await setDoc(doc(db, "users", currentUser.displayName, "projects", data.projectname), {
       name: data.projectName,
       description: data.projectDesc,
       visibility: data.visibility,
+      owner: currentUser.displayName,
     });
 
     router.push(`/${currentUser.displayName}/${data.projectName}`);
@@ -93,7 +94,13 @@ const New = () => {
 
         <div>
           <label htmlFor="visibility" className={styles.radioLabel}>
-            <input {...register("visibility", { required: true })} type="radio" value="public" />
+            <input
+              id="visibility"
+              {...register("visibility", { required: true })}
+              type="radio"
+              value="public"
+              checked={true}
+            />
             <div className={styles.icon}>
               <BsPeopleFill />
             </div>
@@ -104,7 +111,7 @@ const New = () => {
           </label>
 
           <label htmlFor="visibility" className={styles.radioLabel}>
-            <input {...register("visibility", { required: true })} type="radio" value="private" />
+            <input id="visibility" {...register("visibility", { required: true })} type="radio" value="private" />
             <div className={styles.icon}>
               <BsLockFill />
             </div>
