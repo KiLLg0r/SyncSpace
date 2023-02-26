@@ -34,14 +34,19 @@ const New = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    await setDoc(doc(db, "users", currentUser.displayName, "projects", data.projectname), {
-      name: data.projectName,
-      description: data.projectDesc,
-      visibility: data.visibility,
-      owner: currentUser.displayName,
-    });
+    const user = currentUser.displayName;
+    const { projectName, projectDesc, visibility } = data;
 
-    router.push(`/${currentUser.displayName}/${data.projectName}`);
+    await setDoc(doc(db, "users", `${user}/projects/${projectName}`), {
+      name: projectName,
+      description: projectDesc,
+      visibility: visibility,
+      owner: user,
+    })
+      .then(() => {
+        router.push(`/${user}/${projectName}`);
+      })
+      .catch((error) => alert(error));
   };
 
   return (
@@ -93,9 +98,9 @@ const New = () => {
         </h4>
 
         <div>
-          <label htmlFor="visibility" className={styles.radioLabel}>
+          <label htmlFor="visibilityPublic" className={styles.radioLabel}>
             <input
-              id="visibility"
+              id="visibilityPublic"
               {...register("visibility", { required: true })}
               type="radio"
               value="public"
@@ -110,8 +115,13 @@ const New = () => {
             </div>
           </label>
 
-          <label htmlFor="visibility" className={styles.radioLabel}>
-            <input id="visibility" {...register("visibility", { required: true })} type="radio" value="private" />
+          <label htmlFor="visibilityPrivate" className={styles.radioLabel}>
+            <input
+              id="visibilityPrivate"
+              {...register("visibility", { required: true })}
+              type="radio"
+              value="private"
+            />
             <div className={styles.icon}>
               <BsLockFill />
             </div>

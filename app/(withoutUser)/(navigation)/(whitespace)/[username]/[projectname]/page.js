@@ -35,23 +35,23 @@ import Empty from "@public/empty.svg";
 
 // Utils
 import { getLanguage } from "@utils/languages";
+import theme from "@utils/theme.json";
 
 const Project = ({ params }) => {
   const currentUser = authStore((state) => state.currentUser);
   const router = useRouter();
 
-  const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("");
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [confirmUpload, setConfirmUpload] = useState(false);
   const [projectData, setProjectData] = useState(0);
   const [hasFiles, setHasFiles] = useState(false);
-  const [supportFileSystemAccessAPI, setSupportFileSystemAccessAPI] = useState(null);
+  const [supportFileSystemAccessAPI, setSupportFileSystemAccessAPI] = useState(false);
   const [focus, setFocus] = useState({ path: `users/${params.username}/${params.projectname}/` });
+  const [warning, setWarning] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
-  const [editorRef, setEditorRef] = useState(null);
-  const [monacoRef, setMonacoRef] = useState(null);
+  const editorRef = useRef(null);
+  const monacoRef = useRef(null);
 
   const inputRef = useRef(null);
 
@@ -70,8 +70,11 @@ const Project = ({ params }) => {
   ];
 
   const handleEditorDidMount = (editor, monaco) => {
-    setMonacoRef(monaco);
-    setEditorRef(editor);
+    monacoRef.current = monaco;
+    editorRef.current = editor;
+
+    monaco.editor.defineTheme("syncspace", theme);
+    monaco.editor.setTheme("syncspace");
   };
 
   useEffect(() => {
@@ -95,11 +98,16 @@ const Project = ({ params }) => {
   }, [params, projectData, hasFiles]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if ("showDirectoryPicker" in window) setSupportFileSystemAccessAPI(true);
-      else setSupportFileSystemAccessAPI(false);
-    }
-  }, []);
+    if (typeof window !== "undefined")
+      if (!hasFiles)
+        if ("showDirectoryPicker" in window) {
+          setSupportFileSystemAccessAPI(true);
+          setWarning(false);
+        } else {
+          setSupportFileSystemAccessAPI(false);
+          setWarning(true);
+        }
+  }, [hasFiles]);
 
   const getFiles = async (directoryHandle, path = "") => {
     for await (const entry of directoryHandle.values()) {
@@ -261,8 +269,13 @@ const Project = ({ params }) => {
     await getBytes(docRef)
       .then((res) => {
         const decoder = new TextDecoder();
-        setLanguage(fileLanguage);
-        setCode(decoder.decode(res));
+
+        editorRef.current.getModel().setValue(decoder.decode(res));
+        monacoRef.current.editor.setModelLanguage(editorRef.current.getModel(), fileLanguage);
+
+        const contentHeight = Math.min(1000, editorRef.current.getContentHeight());
+        editorRef.current.layout({ height: contentHeight });
+
         setShowEditor(true);
       })
       .catch((error) => alert(error));
@@ -354,14 +367,16 @@ const Project = ({ params }) => {
           )}
           <div style={{ display: !showEditor && "none" }}>
             <Editor
-              height="100vh"
-              width="100%"
+              height="100%"
               theme="vs-dark"
-              value={code}
-              language={language}
-              onChange={setCode}
               onMount={handleEditorDidMount}
-              options={{ readOnly: true }}
+              options={{
+                readOnly: true,
+                scrollBeyondLastLine: false,
+                wordWrap: "on",
+                wrappingStrategy: "advanced",
+                overviewRulerLanes: 0,
+              }}
               className={styles.editor}
             />
           </div>
@@ -401,6 +416,21 @@ const Project = ({ params }) => {
           })}
         <button type="button" onClick={uploadFiles} className={modal.modalButton}>
           Upload
+        </button>
+      </Modal>
+      <Modal
+        open={warning}
+        onClose={() => {
+          setWarning(false);
+        }}
+      >
+        <h2>⚠️ Warning ⚠️</h2>
+        <p className={styles.modalSubtitle}>
+          Your browser does not support File System Access API, so loading folders and files will be slower and will not
+          display states like loading, only finished if is successfull.
+        </p>
+        <button type="button" onClick={() => setWarning(false)} className={modal.modalButton}>
+          Close
         </button>
       </Modal>
     </div>
