@@ -35,6 +35,7 @@ import { storage } from "@config/firebase";
 
 // Utils
 import { getLanguage } from "@utils/languages";
+import theme from "@utils/theme-dark.json";
 
 // React hooks form
 import { useForm } from "react-hook-form";
@@ -94,6 +95,10 @@ const EditorComponent = ({ params }) => {
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
     monacoInstance = monaco;
+
+    monaco.editor.defineTheme("syncspace", theme);
+    monaco.editor.setTheme("syncspace");
+
     setEditorRef(editor);
   };
 
@@ -387,11 +392,6 @@ const EditorComponent = ({ params }) => {
   };
 
   useEffect(() => {
-    document.addEventListener("click", documentClick);
-    return () => document.removeEventListener("click", documentClick);
-  });
-
-  useEffect(() => {
     const save = setInterval(() => {
       let tab = null;
       if (Object.values(tabs).indexOf(true) > -1) tab = Object.keys(tabs).find((key) => tabs[key] === true);
@@ -402,7 +402,10 @@ const EditorComponent = ({ params }) => {
     return () => clearInterval(save);
   }, [tabs]);
 
-  console.log(errorsFile, errorsFolder, errorsRename);
+  useEffect(() => {
+    document.addEventListener("click", documentClick);
+    return () => document.removeEventListener("click", documentClick);
+  });
 
   return (
     <div className={styles.editor}>
@@ -419,39 +422,31 @@ const EditorComponent = ({ params }) => {
         </div>
       </header>
       <main>
-        <aside className={styles.sidebar}>
-          <nav className={styles.nav}>
-            <label>
-              <input type="checkbox" id="files" />
-              <BsFiles />
-              Files
-            </label>
-          </nav>
-          <div
-            className={styles.files}
-            onClick={(e) => {
-              e.preventDefault();
-              if (e.target === e.currentTarget) setFocus({ path: `users/${params.username}/${params.projectname}/` });
-            }}
-          >
-            <div className={styles.actionButtons}>
-              <button type="button" className={styles.button} onClick={() => setNewFileModal(true)}>
-                <BsFilePlus />
-                New file
-              </button>
-              <button type="button" className={styles.button} onClick={() => setNewFolderModal(true)}>
-                <BsFolderPlus />
-                New folder
-              </button>
-            </div>
-            <FileExplorer
-              docRef={projectRef}
-              onClick={handleClick}
-              focusedItem={focus.path}
-              key={newUpdate}
-              rightClick={rightClickHandle}
-            />
+        <aside
+          className={styles.files}
+          onClick={(e) => {
+            e.preventDefault();
+            rightClick && setRightClick(false);
+            if (e.target === e.currentTarget) setFocus({ path: `users/${params.username}/${params.projectname}/` });
+          }}
+        >
+          <div className={styles.actionButtons}>
+            <button type="button" className={styles.button} onClick={() => setNewFileModal(true)}>
+              <BsFilePlus />
+              New file
+            </button>
+            <button type="button" className={styles.button} onClick={() => setNewFolderModal(true)}>
+              <BsFolderPlus />
+              New folder
+            </button>
           </div>
+          <FileExplorer
+            docRef={projectRef}
+            onClick={handleClick}
+            focusedItem={focus.path}
+            key={newUpdate}
+            rightClick={rightClickHandle}
+          />
         </aside>
         <section>
           <nav className={styles.tabs} onWheel={(e) => handleScroll(e)} ref={tabsContainerRef}>

@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 :root {
-  --accent: #ff9824;
-  --accent-dark: #c56900;
+  --accent: #ff8d0a;
+  --accent-dark: hsl(32, 100%, 45%);
   --red: #c92b2b;
   --red-dark: #841c1c;
   --green: #17c964;

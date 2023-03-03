@@ -3,6 +3,7 @@
     font-size: 2rem;
     color: var(--accent);
     font-weight: 600;
+    margin-bottom: 1rem;
   }
 
   .editor {
@@ -129,7 +130,6 @@
     svg {
       display: block;
       width: 40%;
-      aspect-ratio: 1 / 1;
       margin-inline: auto;
       margin-bottom: 1rem;
     }

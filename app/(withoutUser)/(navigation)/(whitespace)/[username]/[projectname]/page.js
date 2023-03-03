@@ -273,9 +273,6 @@ const Project = ({ params }) => {
         editorRef.current.getModel().setValue(decoder.decode(res));
         monacoRef.current.editor.setModelLanguage(editorRef.current.getModel(), fileLanguage);
 
-        const contentHeight = Math.min(1000, editorRef.current.getContentHeight());
-        editorRef.current.layout({ height: contentHeight });
-
         setShowEditor(true);
       })
       .catch((error) => alert(error));
@@ -301,7 +298,7 @@ const Project = ({ params }) => {
         pauseOnHover
         theme="dark"
       />
-      <div className={styles.header}>{projectData?.name}</div>
+
       <main className={styles.content}>
         <div className={styles.code}>
           {hasFiles ? (
@@ -367,7 +364,7 @@ const Project = ({ params }) => {
           )}
           <div style={{ display: !showEditor && "none" }}>
             <Editor
-              height="100%"
+              height="50vh"
               theme="vs-dark"
               onMount={handleEditorDidMount}
               options={{
@@ -383,6 +380,7 @@ const Project = ({ params }) => {
         </div>
         <div className={styles.line}></div>
         <aside className={styles.aside}>
+          <div className={styles.header}>{projectData?.name}</div>
           {currentUser?.displayName === projectData?.owner && (
             <Link href={`/${params.username}/${params.projectname}/edit`} className={styles.editBtn}>
               Edit project
