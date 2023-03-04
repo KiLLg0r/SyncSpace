@@ -14,38 +14,36 @@
     gap: 0.5rem;
     padding: 0 1rem;
     padding-right: 2.5rem;
-    background-color: var(--gray-dark-200);
-    border-radius: 0.5rem 0.5rem 0 0;
-    margin-right: 0.25rem;
+    background-color: var(--gray-dark-300);
     position: relative;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 
     &:hover {
-      background-color: var(--gray-dark-400);
-    }
-
-    &.active {
-      background-color: var(--accent-dark);
-
-      &:hover {
-        background-color: var(--accent);
-      }
-
-      & + .closeBtn:hover {
-        background-color: var(--accent);
-      }
+      background-color: var(--gray-dark-100);
     }
   }
 
-  &:has(.closeBtn:hover) {
+  &.active {
     .tab {
-      pointer-events: none;
+      background-color: var(--accent);
+      color: var(--gray-dark-400);
+
       &:hover {
-        background-color: var(--gray-dark-200);
+        background-color: var(--accent-dark);
+        color: var(--foreground);
+
+        & + svg {
+          color: var(--foreground);
+        }
       }
 
-      &.active:hover {
+      & + .closeBtn:hover {
         background-color: var(--accent-dark);
       }
+    }
+
+    svg {
+      color: var(--gray-dark-400);
     }
   }
 

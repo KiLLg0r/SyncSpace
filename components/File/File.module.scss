@@ -1,55 +1,49 @@
-.file,
-.folder {
-  border-radius: 0.5rem;
-
-  &.focused {
-    background: var(--gray-light-100);
-    .content:hover {
-      background: var(--gray-light-300);
-    }
-  }
-
-  .content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    padding-block: 0.05rem;
+.container {
+  .file,
+  .folder {
     border-radius: 0.5rem;
+    all: unset;
+    display: block;
+    width: 100%;
+    padding-left: 0.25rem;
 
-    &:hover {
-      background: var(--gray-light-100);
+    &.focused {
+      background: var(--gray);
     }
-  }
-}
 
-.file {
-  all: unset;
-  display: block;
-  padding-left: 2rem;
-}
-
-.folder {
-  padding-left: 0.5rem;
-
-  .content:hover {
-    background: var(--gray-light-100);
-  }
-
-  .children {
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-
-    &.closed {
-      display: none;
+    .content {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding-block: 0.05rem;
+      color: var(--gray-light-600);
     }
   }
 
-  .chevron {
-    font-size: 1rem;
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  .file {
+    .content {
+      margin-left: 1.5rem;
+    }
   }
 
-  .closedFolder {
-    transform: rotate(180deg);
+  .folder {
+    .children {
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+      margin-left: 1rem;
+
+      &.closed {
+        display: none;
+      }
+    }
+
+    .chevron {
+      font-size: 1rem;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+    }
+
+    .closedFolder {
+      transform: rotate(180deg);
+    }
   }
 }

@@ -1,0 +1,11 @@
+.error {
+  margin-block: 1rem;
+  outline: 2px solid var(--red);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  color: var(--red);
+}
+
+.error.authError {
+  margin-bottom: 0;
+}

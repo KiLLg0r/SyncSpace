@@ -4,6 +4,7 @@
   display: grid;
   place-items: center;
   background: var(--background);
+  z-index: 9999;
 
   .loading {
     padding: 1rem;
