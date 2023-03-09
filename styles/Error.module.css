@@ -9,3 +9,10 @@
 .error.authError {
   margin-bottom: 0;
 }
+
+.errorSmall {
+  margin-top: 0.25rem;
+  padding-left: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--red);
+}

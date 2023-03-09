@@ -17,7 +17,7 @@ import { FaCog } from "react-icons/fa";
 import styles from "./Nav.module.scss";
 
 // React / Next
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
 // Auth store
@@ -47,6 +47,14 @@ const Navigation = () => {
     }
     setOpen(!open);
   };
+
+  useEffect(() => {
+    const documentClick = () => {
+      if (dropdownRef.current && open) setOpen(false);
+    };
+    document.addEventListener("click", documentClick);
+    return () => document.removeEventListener("click", documentClick);
+  }, [open]);
 
   return (
     <nav className={styles.nav}>

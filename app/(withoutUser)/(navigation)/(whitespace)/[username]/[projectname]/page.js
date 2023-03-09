@@ -23,7 +23,7 @@ import authStore from "@store/authStore";
 import { useState, useRef, useEffect } from "react";
 
 // Components
-import FileExplorer from "@components/File explorer";
+import FileExplorer from "@components/TreeNode";
 import Modal from "@components/Modal";
 
 // Toastify
@@ -56,12 +56,12 @@ const Project = ({ params }) => {
   const inputRef = useRef(null);
 
   const ignoreFilesAndFolders = [
-    "/node_modules",
-    "/.next",
-    "/.git",
-    "/out",
-    "/build",
-    "/coverage",
+    "node_modules",
+    ".next",
+    ".git",
+    "out",
+    "build",
+    "coverage",
     ".env",
     ".vscode",
     ".pnp",
@@ -112,7 +112,7 @@ const Project = ({ params }) => {
   const getFiles = async (directoryHandle, path = "") => {
     for await (const entry of directoryHandle.values()) {
       if (
-        !ignoreFilesAndFolders.some((ignore) => path.includes(ignore)) ||
+        !ignoreFilesAndFolders.some((ignore) => path.includes(ignore)) &&
         !ignoreFilesAndFolders.some((ignore) => entry.name.includes(ignore))
       )
         if (entry.kind === "directory") await getFiles(entry, `${path}/${entry.name}`);

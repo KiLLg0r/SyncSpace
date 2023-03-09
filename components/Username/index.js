@@ -56,7 +56,7 @@ const Username = ({ children }) => {
 
       await setDoc(doc(db, "users", data.username), {
         name: data.username,
-      });
+      }).catch((error) => alert(error));
 
       setOpenModal(false);
 

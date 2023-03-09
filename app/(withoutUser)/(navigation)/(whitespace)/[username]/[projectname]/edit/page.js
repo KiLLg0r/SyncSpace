@@ -17,34 +17,27 @@ import randomColor from "randomcolor";
 
 // Styles
 import styles from "./Editor.module.scss";
-import modalStyles from "@components/Modal/Modal.module.scss";
-import errorStyles from "@styles/Error.module.css";
-
 // Icons
-import { BsFolderFill, BsBoxArrowLeft, BsFiles, BsFolderPlus, BsFilePlus } from "react-icons/bs";
+import { BsFolderFill, BsBoxArrowLeft, BsFolderPlus, BsFilePlus } from "react-icons/bs";
 
 // Components
-import FileExplorer from "@components/File explorer";
 import Tab from "@components/Tab";
 import Loading from "@components/Loading";
-import Modal from "@components/Modal";
+import TreeNode from "@components/TreeNode";
 
 // Firebase
-import { ref, getBytes, uploadString, deleteObject, listAll, uploadBytes } from "firebase/storage";
+import { ref, getBytes, uploadBytes } from "firebase/storage";
 import { storage } from "@config/firebase";
 
 // Utils
 import { getLanguage } from "@utils/languages";
 import theme from "@utils/theme-dark.json";
 
-// React hooks form
-import { useForm } from "react-hook-form";
-
-// Animation
-import { motion, AnimatePresence } from "framer-motion";
-
 // Auth store
 import authStore from "@store/authStore";
+
+// Hooks
+import useTree from "@hooks/useTree";
 
 let ydocument = new Y.Doc();
 let documentList = ydocument.getMap("project-files");
@@ -57,40 +50,26 @@ let monacoBinding = null;
 const EditorComponent = ({ params }) => {
   const [code, setCode] = useState("");
   const [editorRef, setEditorRef] = useState(null);
-  const [projectRef, setProjectRef] = useState(ref(storage, `users/${params.username}/${params.projectname}/`));
   const [tabs, setTabs] = useState({});
-  const [focus, setFocus] = useState({ path: `users/${params.username}/${params.projectname}/` });
-  const [newUpdate, updateState] = useState();
-  const [newFileModal, setNewFileModal] = useState(false);
-  const [newFolderModal, setNewFolderModal] = useState(false);
-  const [renameModal, setRenameModal] = useState(false);
   const [rightClick, setRightClick] = useState(false);
-  const [xy, setXY] = useState({ x: 0, y: 0 });
-  const [path, setPath] = useState({ path: "", folder: false });
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [rightClickData, setRightClickData] = useState({ path: "", folder: false, id: 0 });
+  const [renamedNode, setRenamedNode] = useState(-1);
+  const [explorerData, setExplorerData] = useState({});
+  const [focus, setFocus] = useState({
+    path: `users/${params.username}/${params.projectname}/`,
+    isFolder: true,
+    input: {
+      visible: false,
+      isFolder: false,
+    },
+  });
+
   const currentUser = authStore((state) => state.currentUser);
   const tabsContainerRef = useRef(null);
   const router = useRouter();
 
-  const {
-    register: registerFile,
-    handleSubmit: handleSubmitFile,
-    reset: resetFile,
-    formState: { errors: errorsFile },
-  } = useForm();
-
-  const {
-    register: registerFolder,
-    handleSubmit: handleSubmitFolder,
-    reset: resetFolder,
-    formState: { errors: errorsFolder },
-  } = useForm();
-
-  const {
-    register: registerRename,
-    handleSubmit: handleSubmitRename,
-    reset: resetRename,
-    formState: { errors: errorsRename },
-  } = useForm();
+  const { insertNode, createFileTree, orderTree, deleteNode, renameNode } = useTree();
 
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;
@@ -102,35 +81,58 @@ const EditorComponent = ({ params }) => {
     setEditorRef(editor);
   };
 
+  const handleInsertNode = (folderId, item, isFolder, path) => {
+    const finalTree = insertNode(explorerData, folderId, item, isFolder, path);
+    const orderedTree = orderTree(finalTree);
+
+    setFocus({ ...focus, path: `${path}/${item}/`, isFolder: isFolder, input: { visible: false, isFolder: false } });
+    setExplorerData(orderedTree);
+  };
+
+  const handleDeleteNode = (e) => {
+    e.preventDefault();
+
+    const tree = deleteNode(explorerData, rightClickData.id);
+
+    const removedStorageName = rightClickData.path.substring(rightClickData.path.indexOf("/") + 1);
+    const removedUsername = removedStorageName.substring(removedStorageName.indexOf("/") + 1);
+    const removedProjectName = removedUsername.substring(removedUsername.indexOf("/") + 1);
+
+    let tab = !(removedProjectName in tabs);
+    if (!tab) closeTab(removedProjectName);
+
+    setRightClick(false);
+    setExplorerData(tree);
+  };
+
+  const handleRenameClick = (e) => {
+    e.preventDefault();
+    setRightClick(false);
+    setRenamedNode(rightClickData.id);
+  };
+
+  const handleRenameNode = async (id, newName) => {
+    const tree = renameNode(explorerData, id, newName, documentList);
+    const orderedTree = orderTree(tree);
+
+    setRenamedNode(-1);
+    setExplorerData(orderedTree);
+  };
+
+  const handleNew = (e, isFolder) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFocus({
+      ...focus,
+      input: {
+        visible: true,
+        isFolder,
+      },
+    });
+  };
+
   if (!currentUser || params.username !== currentUser?.displayName)
     router.replace(`/${params.username}/${params.projectname}/`);
-
-  useEffect(() => {
-    if (editorRef) {
-      try {
-        provider = new WebrtcProvider("monaco", ydocument);
-        awareness = provider.awareness;
-
-        const randomcolor = randomColor();
-
-        awareness.setLocalStateField("user", {
-          name: currentUser.displayName,
-          color: randomcolor,
-        });
-
-        console.log("Connected to room 1");
-      } catch (error) {
-        throw new Error(error);
-      }
-
-      return () => {
-        if (provider) {
-          provider.disconnect();
-          ydocument.destroy();
-        }
-      };
-    }
-  }, [currentUser, editorRef]);
 
   const bindEditor = (ytext) => {
     if (monacoBinding) monacoBinding.destroy();
@@ -140,18 +142,19 @@ const EditorComponent = ({ params }) => {
     });
   };
 
-  const handleClick = async (docRef, folder = false) => {
+  const handleClick = async (path, folder = false) => {
     if (folder) {
-      setFocus({ path: docRef.fullPath });
+      setFocus({ ...focus, path: path });
       return;
     }
 
     let content;
 
-    const removedRootName = docRef.fullPath.substring(docRef.fullPath.indexOf("/") + 1);
-    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
+    const removedStorageName = path.substring(path.indexOf("/") + 1);
+    const removedUsername = removedStorageName.substring(removedStorageName.indexOf("/") + 1);
+    const removedProjectName = removedUsername.substring(removedUsername.indexOf("/") + 1);
 
-    const fileExtension = docRef.name.split(".").pop();
+    const fileExtension = path.split(".").pop();
     const language = getLanguage(fileExtension);
 
     let tab = null;
@@ -165,14 +168,14 @@ const EditorComponent = ({ params }) => {
     newObject[removedProjectName] = true;
     setTabs(newObject);
 
-    setFocus({ path: docRef.fullPath });
+    setFocus({ ...focus, path: path });
 
     monacoInstance.editor.setModelLanguage(monacoInstance.editor.getModels()[0], language);
 
     if (documentList.has(removedProjectName)) {
       bindEditor(documentList.get(removedProjectName));
     } else {
-      await getBytes(docRef)
+      await getBytes(ref(storage, path))
         .then((res) => {
           const decoder = new TextDecoder();
           content = decoder.decode(res);
@@ -208,7 +211,7 @@ const EditorComponent = ({ params }) => {
   };
 
   const closeTab = (name) => {
-    setFocus({ path: "projects/SyncSpace/" });
+    setFocus({ ...focus, path: `users/${params.username}/${params.projectname}/` });
     saveFile(name);
     const newObject = { ...tabs };
     delete newObject[name];
@@ -221,101 +224,25 @@ const EditorComponent = ({ params }) => {
     tabsContainer.scrollLeft += e.deltaY;
   };
 
-  const addNewFolder = (data, e) => {
-    e.preventDefault();
-
-    const folderName = data.folder;
-    const initialLength = focus.path.length;
-
-    const checkForFile = focus.path.split(".").pop();
-    const newPath =
-      checkForFile.length < initialLength
-        ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${folderName}/‎`
-        : `${focus.path}/${folderName}/‎`;
-
-    const storageRef = ref(storage, newPath);
-
-    uploadString(storageRef, "").then(() => {
-      setNewFolderModal(false);
-      updateState(newPath);
-      handleClick(storageRef, true);
-    });
-  };
-
-  const addNewFile = (data, e) => {
-    e.preventDefault();
-
-    const fileName = data.file;
-    const initialLength = focus.path.length;
-
-    const checkForFile = focus.path.split(".").pop();
-    const newPath =
-      checkForFile.length < initialLength
-        ? `${focus.path.substring(0, focus.path.lastIndexOf("/") + 1)}/${fileName}`
-        : `${focus.path}/${fileName}`;
-
-    const storageRef = ref(storage, newPath);
-
-    uploadString(storageRef, "\n")
-      .then(() => {
-        setNewFileModal(false);
-        updateState(newPath);
-        handleClick(storageRef);
-      })
-      .catch((error) => alert(error));
-  };
-
   const documentClick = useCallback(() => {
     rightClick && setRightClick(false);
-  }, [rightClick]);
+    renamedNode !== -1 && setRenamedNode(-1);
+  }, [renamedNode, rightClick]);
 
-  const rightClickHandle = (e, path, folder = false) => {
+  const rightClickHandle = (e, path, type, id) => {
     e.preventDefault();
     setRightClick(false);
     const coord = {
       x: e.pageX,
       y: e.pageY,
     };
-    setXY(coord);
+    setCoords(coord);
     setRightClick(true);
-    setPath({ path: path, folder: folder });
-  };
-
-  const deleteFolder = (path) => {
-    const storageRef = ref(storage, path);
-    listAll(storageRef)
-      .then((dir) => {
-        dir.items.forEach((fileRef) => deleteFile(fileRef.fullPath));
-        dir.prefixes.forEach((folderRef) => deleteFolder(folderRef.fullPath));
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const deleteFile = (pathToFile) => {
-    const storageRef = ref(storage, pathToFile);
-    const removedRootName = pathToFile.substring(pathToFile.indexOf("/") + 1);
-    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
-
-    let tab = !(removedProjectName in tabs);
-    if (!tab) closeTab(removedProjectName);
-
-    deleteObject(storageRef)
-      .then(() => {
-        setPath({ path: "", folder: false });
-        updateState(pathToFile);
-        setRightClick(false);
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const handleDelete = (e) => {
-    e.preventDefault();
-    if (path.folder) deleteFolder(path.path);
-    else deleteFile(path.path);
+    setRightClickData({ path: path, isFolder: type ? "folder" : "file", id: id });
   };
 
   const saveFile = (name, value = null) => {
-    const storageRef = ref(storage, `/projects/SyncSpace/${name}`);
+    const storageRef = ref(storage, `users/${params.username}/${params.projectname}/${name}`);
     let data;
 
     if (value === null) {
@@ -330,66 +257,45 @@ const EditorComponent = ({ params }) => {
       .catch((error) => console.log(error));
   };
 
-  const renameFolder = (pathToFolder, newPath, oldPath) => {
-    const storageRef = ref(storage, pathToFolder);
-    listAll(storageRef)
-      .then((dir) => {
-        dir.items.forEach((fileRef) => {
-          renameFile(fileRef.fullPath, newPath, oldPath);
+  useEffect(() => {
+    if (Object.keys(explorerData).length === 0) {
+      const data = createFileTree(
+        ref(storage, `users/${params.username}/${params.projectname}/`),
+        `users/${params.username}/${params.projectname}/`,
+        params.projectname,
+      );
+      setExplorerData(data);
+    }
+  }, [createFileTree, explorerData, params]);
+
+  useEffect(() => {
+    if (editorRef) {
+      try {
+        provider = new WebrtcProvider("monaco", ydocument, {
+          // signaling: ["wss://syncspace-websocket.herokuapp.com/"],
         });
-        dir.prefixes.forEach((folderRef) => renameFolder(folderRef.fullPath, newPath, oldPath));
-      })
-      .catch((error) => console.log(error));
-    deleteFolder(pathToFolder);
-  };
+        awareness = provider.awareness;
 
-  const renameFile = async (pathToFile, newPath, oldPath) => {
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
+        const randomcolor = randomColor();
 
-    const removedRootName = pathToFile.substring(pathToFile.indexOf("/") + 1);
-    const removedProjectName = removedRootName.substring(removedRootName.indexOf("/") + 1);
+        awareness.setLocalStateField("user", {
+          name: currentUser.displayName,
+          color: randomcolor,
+        });
 
-    const path = pathToFile.replace(oldPath, newPath);
+        console.log("Connected to room 1");
+      } catch (error) {
+        throw new Error(error);
+      }
 
-    const storageRef = ref(storage, pathToFile);
-    const newStorageRef = ref(storage, path);
-    let content;
-
-    if (documentList.has(removedProjectName)) content = documentList.get(removedProjectName).toString();
-    else
-      await getBytes(storageRef)
-        .then((res) => {
-          content = decoder.decode(res);
-        })
-        .catch((error) => alert(error));
-
-    const saveContent = encoder.encode(content);
-
-    uploadBytes(newStorageRef, saveContent)
-      .then(() => {
-        setPath({ path: "", folder: false });
-        updateState(pathToFile);
-        setRightClick(false);
-      })
-      .catch((error) => alert(error));
-
-    deleteFile(pathToFile);
-  };
-
-  const handleRename = (data, e) => {
-    e.preventDefault();
-    const oldPath = path.path;
-    const currentPath = oldPath.split("/");
-    currentPath.pop();
-    currentPath.push(data.rename);
-
-    const newPath = currentPath.join("/");
-    if (path.folder) renameFolder(oldPath, newPath, oldPath);
-    else renameFile(oldPath, newPath, oldPath);
-
-    setRenameModal(false);
-  };
+      return () => {
+        if (provider) {
+          provider.disconnect();
+          ydocument.destroy();
+        }
+      };
+    }
+  }, [currentUser, editorRef]);
 
   useEffect(() => {
     const save = setInterval(() => {
@@ -400,7 +306,7 @@ const EditorComponent = ({ params }) => {
     }, 60 * 1000);
 
     return () => clearInterval(save);
-  }, [tabs]);
+  }, [tabs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     document.addEventListener("click", documentClick);
@@ -426,26 +332,32 @@ const EditorComponent = ({ params }) => {
           className={styles.files}
           onClick={(e) => {
             e.preventDefault();
-            rightClick && setRightClick(false);
-            if (e.target === e.currentTarget) setFocus({ path: `users/${params.username}/${params.projectname}/` });
+            documentClick();
+            if (e.target === e.currentTarget)
+              setFocus({ ...focus, path: `users/${params.username}/${params.projectname}/` });
           }}
         >
           <div className={styles.actionButtons}>
-            <button type="button" className={styles.button} onClick={() => setNewFileModal(true)}>
+            <button type="button" className={styles.button} onClick={(e) => handleNew(e, false)}>
               <BsFilePlus />
               New file
             </button>
-            <button type="button" className={styles.button} onClick={() => setNewFolderModal(true)}>
+            <button type="button" className={styles.button} onClick={(e) => handleNew(e, true)}>
               <BsFolderPlus />
               New folder
             </button>
           </div>
-          <FileExplorer
-            docRef={projectRef}
-            onClick={handleClick}
-            focusedItem={focus.path}
-            key={newUpdate}
+          <TreeNode
+            tree={explorerData}
+            explorer={explorerData}
+            focusedItem={focus}
+            renamedNode={renamedNode}
+            handleInsertNode={handleInsertNode}
+            handleClick={handleClick}
+            setFocusedItem={setFocus}
             rightClick={rightClickHandle}
+            setRenamedNode={setRenamedNode}
+            handleRenameNode={handleRenameNode}
           />
         </aside>
         <section>
@@ -480,144 +392,15 @@ const EditorComponent = ({ params }) => {
         </section>
       </main>
       {rightClick && (
-        <div className={styles.rightClick} style={{ top: xy.y, left: xy.x }}>
-          <button type="button" onClick={handleDelete}>
+        <div className={styles.rightClick} style={{ top: coords.y, left: coords.x }}>
+          <button type="button" onClick={handleDeleteNode}>
             Delete
           </button>
-          <button type="button" onClick={() => setRenameModal(true)}>
+          <button type="button" onClick={handleRenameClick}>
             Rename
           </button>
         </div>
       )}
-      <Modal
-        open={newFileModal}
-        onClose={() => {
-          resetFile();
-          setNewFileModal(false);
-        }}
-      >
-        <h2>File name</h2>
-        <form onSubmit={handleSubmitFile(addNewFile)}>
-          <input
-            type="text"
-            className={modalStyles.modalInput}
-            placeholder="Give a name for this file"
-            autoFocus={true}
-            aria-invalid={errorsFile.file ? "true" : "false"}
-            {...registerFile("file", { required: true, pattern: /^[\w,\s-]+\.[A-Za-z]{2,4}$/i })}
-          />
-          <AnimatePresence>
-            {errorsFile.file?.type === "required" && (
-              <motion.p
-                role="alert"
-                className={errorStyles.error}
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-              >
-                The file name is required
-              </motion.p>
-            )}
-            {errorsFile.file?.type === "pattern" && (
-              <motion.p
-                role="alert"
-                className={errorStyles.error}
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-              >
-                The given name is not a file
-              </motion.p>
-            )}
-          </AnimatePresence>
-          <button type="submit" className={modalStyles.modalButton}>
-            Create new file
-          </button>
-        </form>
-      </Modal>
-      <Modal
-        open={newFolderModal}
-        onClose={() => {
-          resetFolder();
-          setNewFolderModal(false);
-        }}
-      >
-        <h2>Folder name</h2>
-        <form onSubmit={handleSubmitFolder(addNewFolder)}>
-          <input
-            type="text"
-            className={modalStyles.modalInput}
-            autoFocus={true}
-            placeholder="Give a name for this folder"
-            aria-invalid={errorsFolder.folder ? "true" : "false"}
-            {...registerFolder("folder", { required: true })}
-          />
-          <AnimatePresence>
-            {errorsFolder.folder?.type === "required" && (
-              <motion.p
-                role="alert"
-                className={errorStyles.error}
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-              >
-                The folder name is required
-              </motion.p>
-            )}
-          </AnimatePresence>
-          <button type="submit" className={modalStyles.modalButton}>
-            Create new folder
-          </button>
-        </form>
-      </Modal>
-      <Modal
-        open={renameModal}
-        onClose={() => {
-          resetRename();
-          setRenameModal(false);
-          setRightClick(false);
-        }}
-      >
-        <h2>Rename</h2>
-        <form onSubmit={handleSubmitRename(handleRename)}>
-          <input
-            defaultValue={path.path.split("/").pop()}
-            type="text"
-            className={modalStyles.modalInput}
-            autoFocus={true}
-            placeholder="Give a new name"
-            aria-invalid={errorsRename.rename ? "true" : "false"}
-            {...registerRename("rename", { required: true })}
-          />
-          <AnimatePresence>
-            {errorsRename.rename?.type === "required" && (
-              <motion.p
-                role="alert"
-                className={errorStyles.error}
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-              >
-                A new name is required
-              </motion.p>
-            )}
-            {errorsRename.rename?.type === "custom" && (
-              <motion.p
-                role="alert"
-                className={errorStyles.error}
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-              >
-                {errorsRename.rename?.message}
-              </motion.p>
-            )}
-          </AnimatePresence>
-          <button type="submit" className={modalStyles.modalButton}>
-            Rename
-          </button>
-        </form>
-      </Modal>
     </div>
   );
 };
