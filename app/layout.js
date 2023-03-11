@@ -6,7 +6,7 @@ import "@styles/globals.css";
 // Components
 import Username from "@components/Username";
 import LoadingComponent from "@components/Loading";
-import AuthChange from "@components/Auth change";
+import AuthChange from "@components/AuthChange";
 
 // React
 import { useState, useEffect } from "react";
