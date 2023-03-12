@@ -9,7 +9,6 @@ import {
   BsBoxArrowLeft,
   BsFillChatFill,
   BsFillFolderFill,
-  BsPersonCircle,
 } from "react-icons/bs";
 import { FaCog } from "react-icons/fa";
 
