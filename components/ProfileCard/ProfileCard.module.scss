@@ -1,0 +1,19 @@
+.profileCard {
+  max-width: 300px;
+  width: 100%;
+  .img {
+    margin-inline: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .name {
+    color: var(--accent);
+    font-size: 2rem;
+    font-weight: 600;
+  }
+}

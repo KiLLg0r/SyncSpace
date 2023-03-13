@@ -9,6 +9,9 @@ const nextConfig = {
     });
     return config;
   },
+  images: {
+    domains: ["www.odonovan.co.uk"],
+  },
   experimental: { appDir: true },
 };
 
