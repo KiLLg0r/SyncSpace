@@ -1,0 +1,104 @@
+.folder,
+.file {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  width: 300px;
+  cursor: pointer;
+  gap: 5px;
+  transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+  &:hover {
+    transform: scale(1.05) translateX(0.5rem);
+
+    input,
+    input:disabled {
+      color: var(--foreground) !important;
+    }
+  }
+
+  input {
+    padding: 5px;
+    display: flex;
+    border: none;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    font-family: "Inter", sans-serif;
+    color: var(--foreground);
+    background: var(--gray);
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+    &:focus {
+      outline: 1px solid var(--accent);
+    }
+
+    &:disabled {
+      all: initial;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      color: var(--gray-light-700);
+      border: none;
+      background: transparent;
+    }
+
+    &[aria-invalid="true"] {
+      outline: 1px solid var(--red);
+      animation: shake 0.2s 2;
+    }
+  }
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-left: 5px;
+}
+
+.focused {
+  background: transparent;
+  color: var(--foreground);
+
+  & > input:is(:disabled) {
+    background: var(--gray-light-50);
+    color: var(--foreground);
+  }
+
+  &:has(div > input:is(:disabled)) {
+    background: var(--gray-light-50);
+    color: var(--foreground);
+  }
+}
+
+.inputContainer > span {
+  margin-top: 5px;
+}
+
+.inputContainer__input {
+  color: var(--foreground);
+  background: var(--gray);
+  margin: 6px 0 0px 0;
+  padding: 5px;
+  display: flex;
+  border: 1px solid lightgray;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.file {
+  padding-left: 1.5rem;
+}
+
+@keyframes shake {
+  25%,
+  75% {
+    transform: translateX(6px);
+  }
+
+  50% {
+    transform: translateX(-6px);
+  }
+}

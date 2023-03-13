@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap");
 
 :root {
   --accent: #ff8d0a;
@@ -19,7 +20,7 @@
   --gray-dark-200: #20232a;
   --gray-dark-100: #24282f;
   --gray: #282c34;
-  --gray-light-50: #3a3e44;
+  --gray-light-50: #373d48;
   --gray-light-100: #53565d;
   --gray-light-200: #696b71;
   --gray-light-300: #63656a;
@@ -35,13 +36,13 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: "Inter", sans-serif;
 }
 
 html,
 body {
   height: 100%;
   width: 100%;
+  font-family: "Inter", sans-serif;
   overflow-x: hidden;
 }
 

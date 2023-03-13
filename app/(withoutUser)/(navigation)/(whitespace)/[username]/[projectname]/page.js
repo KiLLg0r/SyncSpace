@@ -23,7 +23,7 @@ import authStore from "@store/authStore";
 import { useState, useRef, useEffect } from "react";
 
 // Components
-import FileExplorer from "@components/File explorer";
+import TreeNode from "@components/TreeNode";
 import Modal from "@components/Modal";
 
 // Toastify
@@ -36,6 +36,7 @@ import Empty from "@public/empty.svg";
 // Utils
 import { getLanguage } from "@utils/languages";
 import theme from "@utils/theme.json";
+import useTree from "@hooks/useTree";
 
 const Project = ({ params }) => {
   const currentUser = authStore((state) => state.currentUser);
@@ -47,21 +48,31 @@ const Project = ({ params }) => {
   const [projectData, setProjectData] = useState(0);
   const [hasFiles, setHasFiles] = useState(false);
   const [supportFileSystemAccessAPI, setSupportFileSystemAccessAPI] = useState(false);
-  const [focus, setFocus] = useState({ path: `users/${params.username}/${params.projectname}/` });
+  const [focus, setFocus] = useState({
+    path: `users/${params.username}/${params.projectname}/`,
+    isFolder: true,
+    input: {
+      visible: false,
+      isFolder: false,
+    },
+  });
   const [warning, setWarning] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
+  const [explorerData, setExplorerData] = useState({});
+
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
-
   const inputRef = useRef(null);
 
+  const { createFileTree } = useTree();
+
   const ignoreFilesAndFolders = [
-    "/node_modules",
-    "/.next",
-    "/.git",
-    "/out",
-    "/build",
-    "/coverage",
+    "node_modules",
+    ".next",
+    ".git",
+    "out",
+    "build",
+    "coverage",
     ".env",
     ".vscode",
     ".pnp",
@@ -98,6 +109,17 @@ const Project = ({ params }) => {
   }, [params, projectData, hasFiles]);
 
   useEffect(() => {
+    if (Object.keys(explorerData).length === 0) {
+      const data = createFileTree(
+        ref(storage, `users/${params.username}/${params.projectname}/`),
+        `users/${params.username}/${params.projectname}/`,
+        params.projectname,
+      );
+      setExplorerData(data);
+    }
+  }, [createFileTree, explorerData, params]);
+
+  useEffect(() => {
     if (typeof window !== "undefined")
       if (!hasFiles)
         if ("showDirectoryPicker" in window) {
@@ -112,7 +134,7 @@ const Project = ({ params }) => {
   const getFiles = async (directoryHandle, path = "") => {
     for await (const entry of directoryHandle.values()) {
       if (
-        !ignoreFilesAndFolders.some((ignore) => path.includes(ignore)) ||
+        !ignoreFilesAndFolders.some((ignore) => path.includes(ignore)) &&
         !ignoreFilesAndFolders.some((ignore) => entry.name.includes(ignore))
       )
         if (entry.kind === "directory") await getFiles(entry, `${path}/${entry.name}`);
@@ -255,18 +277,18 @@ const Project = ({ params }) => {
     });
   };
 
-  const fileClick = async (docRef, folder = false) => {
+  const fileClick = async (path, folder = false) => {
     if (folder) {
-      setFocus({ path: docRef.fullPath });
+      setFocus({ ...focus, path: path });
       return;
     }
 
-    const fileExtension = docRef.name.split(".").pop();
+    const fileExtension = path.split(".").pop();
     const fileLanguage = getLanguage(fileExtension);
 
-    setFocus({ path: docRef.fullPath });
+    setFocus({ ...focus, path: path });
 
-    await getBytes(docRef)
+    await getBytes(ref(storage, path))
       .then((res) => {
         const decoder = new TextDecoder();
 
@@ -302,11 +324,13 @@ const Project = ({ params }) => {
       <main className={styles.content}>
         <div className={styles.code}>
           {hasFiles ? (
-            <FileExplorer
-              docRef={ref(storage, `users/${params.username}/${params.projectname}`)}
-              onClick={fileClick}
-              focusedItem={focus.path}
-              rightClick={() => {}}
+            <TreeNode
+              tree={explorerData}
+              explorer={explorerData}
+              focusedItem={focus}
+              renamedNode="-1"
+              handleClick={fileClick}
+              setFocusedItem={setFocus}
             />
           ) : (
             <div className={styles.noFiles}>

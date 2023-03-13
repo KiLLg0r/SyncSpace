@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import validateError from "@utils/errors";
 
 function Register() {
-  const createAccount = authStore((state) => state.currentUser);
+  const createAccount = authStore((state) => state.createAccount);
   const router = useRouter();
 
   const {

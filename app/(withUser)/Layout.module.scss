@@ -1,0 +1,13 @@
+.dashboard {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: var(--gray-dark-200);
+
+  .content {
+    background: var(--gray);
+    border-radius: 2rem 0 0 2rem;
+    flex: 1;
+    overflow: hidden;
+  }
+}
