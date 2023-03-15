@@ -273,7 +273,7 @@ const EditorComponent = ({ params }) => {
     if (editorRef) {
       try {
         provider = new WebrtcProvider("monaco", ydocument, {
-          // signaling: ["wss://syncspace-websocket.herokuapp.com/"],
+          signaling: ["wss://syncspace-websocket.herokuapp.com/"],
         });
         awareness = provider.awareness;
 
