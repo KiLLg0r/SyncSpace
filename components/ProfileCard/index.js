@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 const getUserData = async (username) => {
   const docRef = doc(db, "users", username);
   const docData = await getDoc(docRef);
+
   if (docData.exists())
     return {
       img: docData.data().img,
@@ -27,20 +28,13 @@ const ProfileCard = ({ username }) => {
   const [data, setData] = useState({});
 
   useEffect(() => {
-    if (Object.keys(data).length === 0)
-      getUserData(username).then((res) => setData(res));
-  }, [data]);
+    if (Object.keys(data).length === 0) getUserData(username).then((res) => setData(res));
+  }, [data, username]);
 
   return (
     <div className={styles.profileCard}>
       <div className={styles.img}>
-        {console.log(data)}
-        <Image
-          src={data.img}
-          fill={true}
-          alt={`${username}'s profile image`}
-          style={{ objectFit: "cover" }}
-        />
+        <Image src={data.img} fill={true} alt={`${username}'s profile image`} style={{ objectFit: "cover" }} />
       </div>
       <div className={styles.text}>
         <div className={styles.name}>{data.name}</div>

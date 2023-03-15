@@ -30,7 +30,7 @@ import { ref, getBytes, uploadBytes } from "firebase/storage";
 import { storage } from "@config/firebase";
 
 // Utils
-import { getLanguage } from "@utils/languages";
+import useLanguages from "@utils/languages";
 import theme from "@utils/theme-dark.json";
 
 // Auth store
@@ -70,6 +70,7 @@ const EditorComponent = ({ params }) => {
   const router = useRouter();
 
   const { insertNode, createFileTree, orderTree, deleteNode, renameNode } = useTree();
+  const { getLanguage } = useLanguages();
 
   const handleEditorDidMount = (editor, monaco) => {
     monacoEditor = editor;

@@ -81,6 +81,7 @@
     gap: 0.5rem;
     align-items: center;
     margin-block: 1rem;
+    cursor: pointer;
 
     input {
       width: 1rem;
@@ -118,5 +119,36 @@
     &:hover {
       background-color: var(--accent-dark);
     }
+  }
+
+  .imageEdit {
+    position: relative;
+    margin-inline: auto;
+    cursor: pointer;
+    overflow: hidden;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 1rem;
+  }
+
+  .imageEditLabel {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.825rem;
+  }
+
+  .projectSection {
+    display: flex;
+    gap: 1rem;
+
+    .inputContainer {
+      width: 100%;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .projectSection {
+    flex-flow: column;
   }
 }

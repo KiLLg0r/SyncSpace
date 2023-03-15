@@ -10,7 +10,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["www.odonovan.co.uk"],
+    domains: ["www.odonovan.co.uk", "firebasestorage.googleapis.com"],
   },
   experimental: { appDir: true },
 };

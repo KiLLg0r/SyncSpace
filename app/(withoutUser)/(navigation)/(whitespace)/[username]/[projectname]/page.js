@@ -34,7 +34,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Empty from "@public/empty.svg";
 
 // Utils
-import { getLanguage } from "@utils/languages";
+import useLanguages from "@utils/languages";
 import theme from "@utils/theme.json";
 import useTree from "@hooks/useTree";
 
@@ -65,6 +65,7 @@ const Project = ({ params }) => {
   const inputRef = useRef(null);
 
   const { createFileTree } = useTree();
+  const { getLanguage } = useLanguages();
 
   const ignoreFilesAndFolders = [
     "node_modules",

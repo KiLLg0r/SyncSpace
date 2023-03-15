@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 
 // Firebase
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "@config/firebase";
+import { db, storage } from "@config/firebase";
+import { ref, uploadBytes, uploadString, getDownloadURL } from "firebase/storage";
 
 // Icons
 import { BsLockFill, BsPeopleFill } from "react-icons/bs";
@@ -22,10 +23,28 @@ import { useForm } from "react-hook-form";
 // Animation
 import { motion, AnimatePresence } from "framer-motion";
 
+// Next image
+import Image from "next/image";
+
+// React
+import { useEffect, useRef, useState } from "react";
+
+// Placeholder image
+import placeholder from "placeholder.js";
+
 const New = () => {
   const router = useRouter();
-
   const currentUser = authStore((state) => state.currentUser);
+
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState("");
+  const imageInputRef = useRef(null);
+
+  const [opts, setOpts] = useState({
+    size: "1024x1024",
+    bgcolor: "#ff8d0a",
+    color: "#08090a",
+  });
 
   const {
     register,
@@ -37,17 +56,37 @@ const New = () => {
     const user = currentUser.displayName;
     const { projectName, projectDesc, visibility } = data;
 
-    await setDoc(doc(db, "users", `${user}/projects/${projectName}`), {
-      name: projectName,
-      description: projectDesc,
-      visibility: visibility,
-      owner: user,
-    })
-      .then(() => {
-        router.push(`/${user}/${projectName}`);
+    const storageRef = ref(storage, `/users/${user}/projects/${projectName}`);
+
+    if (image) await uploadBytes(storageRef, image);
+    else await uploadString(storageRef, placeholder.getData(opts), "data_url");
+
+    getDownloadURL(storageRef)
+      .then(async (url) => {
+        await setDoc(doc(db, "users", `${user}/projects/${projectName}`), {
+          name: projectName,
+          description: projectDesc,
+          visibility: visibility,
+          owner: user,
+          img: url,
+        })
+          .then(() => {
+            router.push(`/${user}/${projectName}`);
+          })
+          .catch((error) => alert(error));
       })
-      .catch((error) => alert(error));
+      .catch((error) => console.log(error));
   };
+
+  useEffect(() => {
+    if (image) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(image);
+    }
+  }, [image]);
 
   return (
     <form className={styles.newProject} onSubmit={handleSubmit(onSubmit)}>
@@ -57,39 +96,73 @@ const New = () => {
       </p>
 
       <section className={styles.projectSection}>
-        <label className={styles.inputLabel}>
-          <div>
-            <label htmlFor="projectName">Project name</label>
-            <span className={styles.require}>*</span>
+        <div className={styles.imageContainer}>
+          <div
+            className={styles.imageEdit}
+            onClick={(e) => {
+              e.preventDefault();
+              imageInputRef.current.click();
+            }}
+          >
+            <Image
+              alt="Project image"
+              fill={true}
+              style={{ objectFit: "cover" }}
+              src={preview ? preview : placeholder.getData(opts)}
+            />
           </div>
+          <h4 className={styles.imageEditLabel}>Select an image for your project</h4>
           <input
-            type="text"
-            {...register("projectName", { required: true, min: 3 })}
-            aria-invalid={errors.projectName ? "true" : "false"}
+            type="file"
+            style={{ display: "none" }}
+            ref={imageInputRef}
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file && file.type.substring(0, 5) === "image") setImage(file);
+              else setImage(null);
+            }}
           />
-          <AnimatePresence>
-            {errors.projectName?.type === "required" && (
-              <motion.p
-                role="alert"
-                className={errorStyles.error}
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-              >
-                A project name is required
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </label>
+        </div>
+        <div className={styles.inputContainer}>
+          <label className={styles.inputLabel}>
+            <div>
+              <label htmlFor="projectName">Project name</label>
+              <span className={styles.require}>*</span>
+            </div>
+            <input
+              type="text"
+              {...register("projectName", {
+                required: true,
+                min: 3,
+                onChange: (e) => setOpts({ ...opts, text: e.target.value }),
+              })}
+              aria-invalid={errors.projectName ? "true" : "false"}
+            />
+            <AnimatePresence>
+              {errors.projectName?.type === "required" && (
+                <motion.p
+                  role="alert"
+                  className={errorStyles.error}
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -50 }}
+                >
+                  A project name is required
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </label>
 
-        <label className={styles.inputLabel}>
-          <div>
-            <label htmlFor="projectDesc">Description</label>
-            <span className={styles.optional}>(optional)</span>
-          </div>
-          <textarea {...register("projectDesc", {})} aria-invalid={errors.projectDesc ? "true" : "false"} />
-          {errors.projectDesc && <p>{errors.projectDesc?.message}</p>}
-        </label>
+          <label className={styles.inputLabel}>
+            <div>
+              <label htmlFor="projectDesc">Description</label>
+              <span className={styles.optional}>(optional)</span>
+            </div>
+            <textarea {...register("projectDesc", {})} aria-invalid={errors.projectDesc ? "true" : "false"} />
+            {errors.projectDesc && <p>{errors.projectDesc?.message}</p>}
+          </label>
+        </div>
       </section>
 
       <section className={styles.visibility}>
@@ -146,6 +219,7 @@ const New = () => {
           )}
         </AnimatePresence>
       </section>
+
       <button className={styles.createProject}>Create project</button>
     </form>
   );
