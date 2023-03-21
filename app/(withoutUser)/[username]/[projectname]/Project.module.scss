@@ -3,7 +3,6 @@
     font-size: 2rem;
     color: var(--accent);
     font-weight: 600;
-    margin-bottom: 1rem;
   }
 
   .editor {
@@ -12,20 +11,21 @@
   }
 
   .content {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 0.5rem;
+    .text {
+      width: 100%;
+    }
+
+    .img {
+      width: clamp(2rem, 10vw, 10rem);
+      height: clamp(2rem, 10vw, 10rem);
+      border-radius: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
 
     .code {
       padding: 1rem;
       width: 100%;
-    }
-
-    .line {
-      width: 90%;
-      height: 1px;
-      background: var(--gray-light-400);
-      margin-inline: auto;
     }
 
     .filesUpload {
@@ -83,24 +83,12 @@
       padding: 1rem;
       width: 100%;
 
-      .editBtn {
-        all: unset;
-        display: block;
-        cursor: pointer;
-        border-radius: 0.5rem;
-        background: var(--green);
-        color: var(--gray-dark-400);
-        font-size: 1.125rem;
-        text-align: center;
-        padding: 0.5rem 1rem;
-        transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-        margin-bottom: 0.5rem;
+      background-color: var(--gray-dark-200);
+      border-radius: 1rem;
+      margin-block: 1rem;
 
-        &:hover {
-          background: var(--green-dark);
-          color: var(--foreground);
-        }
-      }
+      display: flex;
+      gap: 0.5rem;
 
       .item {
         margin-top: 0.5rem;

@@ -30,7 +30,7 @@ import { ref, getBytes, uploadBytes } from "firebase/storage";
 import { storage } from "@config/firebase";
 
 // Utils
-import useLanguages from "@utils/languages";
+import useLanguages from "@hooks/useLanguages";
 import theme from "@utils/theme-dark.json";
 
 // Auth store

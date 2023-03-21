@@ -8,9 +8,20 @@
 
   border-radius: 1rem;
 
-  background-color: var(--gray-dark-100);
+  background-color: var(--gray-dark-200);
 
-  max-width: 500px;
+  transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+  &:hover {
+    opacity: 0.5;
+  }
+
+  .label {
+    font-size: 0.75rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--gray-light-500);
+  }
 
   .leftSide {
     position: relative;

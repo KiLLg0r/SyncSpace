@@ -2,7 +2,6 @@
 
 // Nagivation
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 // Monaco Editor import
 import Editor from "@monaco-editor/react";
@@ -34,9 +33,10 @@ import "react-toastify/dist/ReactToastify.css";
 import Empty from "@public/empty.svg";
 
 // Utils
-import useLanguages from "@utils/languages";
+import useLanguages from "@hooks/useLanguages";
 import theme from "@utils/theme.json";
 import useTree from "@hooks/useTree";
+import Image from "next/image";
 
 const Project = ({ params }) => {
   const currentUser = authStore((state) => state.currentUser);
@@ -323,6 +323,22 @@ const Project = ({ params }) => {
       />
 
       <main className={styles.content}>
+        <aside className={styles.aside}>
+          <div className={styles.img}>
+            <Image src={projectData?.img} alt="Project image" fill style={{ objectFit: "cover" }} sizes={"10rem"} />
+          </div>
+          <div className={styles.text}>
+            <div className={styles.header}>{projectData?.name}</div>
+            <div className={styles.item}>
+              <div className={styles.label}>Owner</div>
+              <div className={styles.value}>{projectData?.owner}</div>
+            </div>
+            <div className={styles.item}>
+              <div className={styles.label}>Description</div>
+              <div className={styles.value}>{projectData?.description}</div>
+            </div>
+          </div>
+        </aside>
         <div className={styles.code}>
           {hasFiles ? (
             <TreeNode
@@ -403,23 +419,6 @@ const Project = ({ params }) => {
             />
           </div>
         </div>
-        <div className={styles.line}></div>
-        <aside className={styles.aside}>
-          <div className={styles.header}>{projectData?.name}</div>
-          {currentUser?.displayName === projectData?.owner && (
-            <Link href={`/${params.username}/${params.projectname}/edit`} className={styles.editBtn}>
-              Edit project
-            </Link>
-          )}
-          <div className={styles.item}>
-            <div className={styles.label}>Owner</div>
-            <div className={styles.value}>{projectData?.owner}</div>
-          </div>
-          <div className={styles.item}>
-            <div className={styles.label}>Description</div>
-            <div className={styles.value}>{projectData?.description}</div>
-          </div>
-        </aside>
       </main>
       <Modal
         open={confirmUpload}

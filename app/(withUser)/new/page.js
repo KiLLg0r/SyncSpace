@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 // Firebase
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "@config/firebase";
 import { ref, uploadBytes, uploadString, getDownloadURL } from "firebase/storage";
 
@@ -40,12 +40,6 @@ const New = () => {
   const [preview, setPreview] = useState("");
   const imageInputRef = useRef(null);
 
-  const [opts, setOpts] = useState({
-    size: "1024x1024",
-    bgcolor: "#ff8d0a",
-    color: "#08090a",
-  });
-
   const {
     register,
     handleSubmit,
@@ -59,7 +53,12 @@ const New = () => {
     const storageRef = ref(storage, `/users/${user}/projects/${projectName}`);
 
     if (image) await uploadBytes(storageRef, image);
-    else await uploadString(storageRef, placeholder.getData(opts), "data_url");
+    else
+      await uploadString(
+        storageRef,
+        placeholder.getData({ size: "1024x1024", bgcolor: "#ff8d0a", color: "#08090a", text: projectName }),
+        "data_url",
+      );
 
     getDownloadURL(storageRef)
       .then(async (url) => {
@@ -69,6 +68,7 @@ const New = () => {
           visibility: visibility,
           owner: user,
           img: url,
+          lastModified: serverTimestamp(),
         })
           .then(() => {
             router.push(`/${user}/${projectName}`);
@@ -108,7 +108,11 @@ const New = () => {
               alt="Project image"
               fill={true}
               style={{ objectFit: "cover" }}
-              src={preview ? preview : placeholder.getData(opts)}
+              src={
+                preview
+                  ? preview
+                  : placeholder.getData({ size: "1024x1024", bgcolor: "#ff8d0a", color: "#08090a", text: "Name" })
+              }
             />
           </div>
           <h4 className={styles.imageEditLabel}>Select an image for your project</h4>
@@ -135,7 +139,6 @@ const New = () => {
               {...register("projectName", {
                 required: true,
                 min: 3,
-                onChange: (e) => setOpts({ ...opts, text: e.target.value }),
               })}
               aria-invalid={errors.projectName ? "true" : "false"}
             />

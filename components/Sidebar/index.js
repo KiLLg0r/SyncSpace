@@ -5,19 +5,11 @@ import styles from "./Sidebar.module.scss";
 
 // Icons
 import { GiRingedPlanet } from "react-icons/gi";
-import {
-  BsHouse,
-  BsFolder,
-  BsChatRightDots,
-  BsBoxArrowLeft,
-  BsPersonCircle,
-  BsChevronUp,
-  BsPlus,
-} from "react-icons/bs";
+import { BsFolder, BsChatRightDots, BsBoxArrowLeft, BsPersonCircle, BsChevronUp, BsPlus } from "react-icons/bs";
 import { HiOutlineCog8Tooth } from "react-icons/hi2";
 
 // React / Next
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Auth store
 import authStore from "@store/authStore";
@@ -26,14 +18,21 @@ import authStore from "@store/authStore";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
+// Firebase
+import { getDocs, query, collection, limit, startAfter } from "firebase/firestore";
+import { db } from "@config/firebase";
+import Image from "next/image";
+
 const Sidebar = () => {
+  const [projects, setProjects] = useState([]);
+  const [lastProject, setLastProject] = useState(null);
+  const [areMoreProject, setAreMoreProject] = useState(false);
   const [open, setOpen] = useState({
     sidebar: true,
     projects: false,
   });
 
   const links = [
-    { name: "Home", icon: <BsHouse />, path: "/home" },
     { name: "Profile", icon: <BsPersonCircle />, path: "/profile" },
     { name: "Projects", icon: <BsFolder />, path: "/projects" },
     { name: "Messages", icon: <BsChatRightDots />, path: "/messages" },
@@ -42,19 +41,54 @@ const Sidebar = () => {
 
   const path = usePathname();
 
+  const currentUser = authStore((state) => state.currentUser);
   const logout = authStore((state) => state.logout);
 
   const toggleSidebar = () => setOpen({ ...open, sidebar: !open.sidebar });
   const toggleProjects = () => setOpen({ ...open, projects: !open.projects });
+
+  const loadMoreProjects = async () => {
+    const next = query(collection(db, "users", currentUser.displayName, "projects"), limit(5), startAfter(lastProject));
+    const documentSnapshots = await getDocs(next);
+
+    const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+
+    let docs = [];
+    documentSnapshots.forEach((doc) => docs.push(doc.data()));
+
+    setProjects((oldDocs) => [...oldDocs, ...docs]);
+    setLastProject(lastVisible);
+    setAreMoreProject(documentSnapshots.docs.length >= 5);
+  };
+
+  useEffect(() => {
+    const getProjects = async () => {
+      const first = query(collection(db, "users", currentUser.displayName, "projects"), limit(5));
+      const documentSnapshots = await getDocs(first);
+
+      const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+
+      let docs = [];
+      documentSnapshots.forEach((doc) => docs.push(doc.data()));
+
+      setProjects(docs);
+      setLastProject(lastVisible);
+      setAreMoreProject(documentSnapshots.docs.length >= 5);
+    };
+
+    if (currentUser?.displayName) getProjects();
+  }, [currentUser?.displayName]);
 
   return (
     <div className={`${styles.sidebar} ${!open.sidebar ? styles.closed : ""}`}>
       <div className={styles.header}>
         <div className={styles.logo}>
           <GiRingedPlanet />
-          <div className={styles.name}>
-            <span>Sync</span>Space
-          </div>
+          <Link href="/">
+            <div className={styles.name}>
+              <span>Sync</span>Space
+            </div>
+          </Link>
         </div>
         <div className={styles.hamburgerMenu} onClick={toggleSidebar}>
           <div className={styles.hline}></div>
@@ -95,7 +129,28 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-        <div className={styles.dropdownContent}></div>
+        {open.projects && (
+          <div className={styles.dropdownContent}>
+            {projects.length > 0 &&
+              projects.map((project) => (
+                <div key={project.lastModified} className={styles.project}>
+                  <div className={styles.img}>
+                    <Image src={project.img} alt={`${project.name} image`} fill style={{ objectFit: "cover" }} />
+                  </div>
+                  <div className={styles.text}>{project.name}</div>
+                  <div className={styles.tooltip}>
+                    <div className={styles.tooltipText}>{project.name}</div>
+                  </div>
+                </div>
+              ))}
+
+            {areMoreProject && (
+              <button type="button" className={styles.loadMore} onClick={loadMoreProjects}>
+                Load more
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={styles.footer}>

@@ -4,8 +4,7 @@
 import authStore from "@store/authStore";
 
 // Navigation
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 // Sidebar
 import Sidebar from "@components/Sidebar";
@@ -17,21 +16,16 @@ export default function Layout({ children }) {
   const currentUser = authStore((state) => state.currentUser);
   const router = useRouter();
 
-  const [key, setKey] = useState(new Date());
+  const path = usePathname();
 
-  if (!currentUser) router.replace("/login");
+  if (!currentUser)
+    if (path === "/") router.replace("/home");
+    else router.replace("/login");
 
   return (
     <div className={styles.dashboard}>
       <Sidebar />
-      <button
-        type="button"
-        onClick={() => setKey(new Date())}
-        style={{ position: "fixed", bottom: "1rem", right: "1rem" }}
-      >
-        Rerender child
-      </button>
-      <div className={styles.content} key={key}>
+      <div className={styles.content}>
         {children}
       </div>
     </div>
