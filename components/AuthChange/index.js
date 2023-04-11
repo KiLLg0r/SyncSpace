@@ -14,16 +14,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import LoadingComponent from "@components/Loading";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
+
+// Nookies
+import nookies from "nookies";
 
 const AuthChange = ({ children }) => {
-  const updateUser = authStore((state) => state.updateUser);
+  const updateUser = useAuthStore((state) => state.updateUser);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       updateUser(user);
       setLoading(false);
+      nookies.set(null, "username", user?.displayName, { path: "/" });
     });
 
     return unsubscribe;

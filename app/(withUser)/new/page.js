@@ -15,7 +15,7 @@ import styles from "./New.module.scss";
 import errorStyles from "@styles/Error.module.css";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
 
 // React hooks form
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ import placeholder from "placeholder.js";
 
 const New = () => {
   const router = useRouter();
-  const currentUser = authStore((state) => state.currentUser);
+  const currentUser = useAuthStore((state) => state.currentUser);
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState("");
@@ -69,6 +69,7 @@ const New = () => {
           owner: user,
           img: url,
           lastModified: serverTimestamp(),
+          contributors: [user]
         })
           .then(() => {
             router.push(`/${user}/${projectName}`);

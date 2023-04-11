@@ -1,21 +1,15 @@
-import { storage } from "@config/firebase";
-import { ref } from "firebase/storage";
-
-import useLanguages from "@hooks/useLanguages";
-
 import styles from "./ProjectCard.module.scss";
 import Image from "next/image";
 
 import Link from "next/link";
 
-const ProjectCard = async ({ username, projectData }) => {
-  const { name, description, img } = projectData;
-  const { getUsedLanguages, getLanguageColor } = useLanguages();
+import ProgrammingLanguages from "@components/ProgrammingLanguages";
 
-  const languages = await getUsedLanguages(ref(storage, `/users/${username}/${projectData.name}`));
+const ProjectCard = ({ username, projectData, inDashboard = false }) => {
+  const { name, description, img } = projectData;
 
   return (
-    <Link href={`/${username}/${name}`} className={styles.projectCard}>
+    <Link href={`/${inDashboard ? "projects" : username}/${name}`} className={styles.projectCard}>
       <div className={styles.leftSide}>
         <Image src={img} alt="Project image" fill style={{ objectFit: "cover" }} sizes={"10rem"} />
       </div>
@@ -30,21 +24,7 @@ const ProjectCard = async ({ username, projectData }) => {
             <p className={styles.description}>{description}</p>
           </>
         )}
-        {Object.keys(languages).length > 0 && (
-          <>
-            <div className={styles.label}>Languages used</div>
-            <div className={styles.languages}>
-              {Object.keys(languages).map((key) => {
-                return (
-                  <span key={key} className={styles.language}>
-                    <div className={styles.color} style={{ background: `${getLanguageColor(key).color}` }}></div>
-                    {getLanguageColor(key).name}
-                  </span>
-                );
-              })}
-            </div>
-          </>
-        )}
+        <ProgrammingLanguages username={username} projectName={name} />
       </div>
     </Link>
   );

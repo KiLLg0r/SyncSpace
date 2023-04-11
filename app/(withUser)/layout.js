@@ -1,7 +1,7 @@
 "use client";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
 
 // Navigation
 import { useRouter, usePathname } from "next/navigation";
@@ -13,7 +13,7 @@ import Sidebar from "@components/Sidebar";
 import styles from "./Layout.module.scss";
 
 export default function Layout({ children }) {
-  const currentUser = authStore((state) => state.currentUser);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const router = useRouter();
 
   const path = usePathname();
@@ -25,9 +25,7 @@ export default function Layout({ children }) {
   return (
     <div className={styles.dashboard}>
       <Sidebar />
-      <div className={styles.content}>
-        {children}
-      </div>
+      <div className={styles.content}>{children}</div>
     </div>
   );
 }

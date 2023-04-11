@@ -2,10 +2,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@config/firebase";
 
 import styles from "./ProfileCard.module.scss";
-
 import Image from "next/image";
-
-import { useEffect, useState } from "react";
 
 const getUserData = async (username) => {
   const docRef = doc(db, "users", username);
@@ -24,12 +21,8 @@ const getUserData = async (username) => {
   };
 };
 
-const ProfileCard = ({ username }) => {
-  const [data, setData] = useState({});
-
-  useEffect(() => {
-    if (Object.keys(data).length === 0) getUserData(username).then((res) => setData(res));
-  }, [data, username]);
+const ProfileCard = async ({ username }) => {
+  const data = await getUserData(username);
 
   return (
     <div className={styles.profileCard}>

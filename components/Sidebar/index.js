@@ -12,7 +12,7 @@ import { HiOutlineCog8Tooth } from "react-icons/hi2";
 import { useState, useEffect } from "react";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
 
 // Navigation
 import { usePathname } from "next/navigation";
@@ -33,22 +33,24 @@ const Sidebar = () => {
   });
 
   const links = [
-    { name: "Profile", icon: <BsPersonCircle />, path: "/profile" },
-    { name: "Projects", icon: <BsFolder />, path: "/projects" },
-    { name: "Messages", icon: <BsChatRightDots />, path: "/messages" },
+    { name: "My profile", icon: <BsPersonCircle />, path: "/profile" },
+    { name: "My projects", icon: <BsFolder />, path: "/projects" },
+    { name: "My messages", icon: <BsChatRightDots />, path: "/messages" },
     { name: "Settings", icon: <HiOutlineCog8Tooth />, path: "/settings" },
   ];
 
   const path = usePathname();
 
-  const currentUser = authStore((state) => state.currentUser);
-  const logout = authStore((state) => state.logout);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const logout = useAuthStore((state) => state.logout);
+
+  const username = currentUser?.displayName;
 
   const toggleSidebar = () => setOpen({ ...open, sidebar: !open.sidebar });
   const toggleProjects = () => setOpen({ ...open, projects: !open.projects });
 
   const loadMoreProjects = async () => {
-    const next = query(collection(db, "users", currentUser.displayName, "projects"), limit(5), startAfter(lastProject));
+    const next = query(collection(db, "users", username, "projects"), limit(5), startAfter(lastProject));
     const documentSnapshots = await getDocs(next);
 
     const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
@@ -63,7 +65,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     const getProjects = async () => {
-      const first = query(collection(db, "users", currentUser.displayName, "projects"), limit(5));
+      const first = query(collection(db, "users", username, "projects"), limit(5));
       const documentSnapshots = await getDocs(first);
 
       const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
@@ -76,8 +78,8 @@ const Sidebar = () => {
       setAreMoreProject(documentSnapshots.docs.length >= 5);
     };
 
-    if (currentUser?.displayName) getProjects();
-  }, [currentUser?.displayName]);
+    if (username) getProjects();
+  }, [username]);
 
   return (
     <div className={`${styles.sidebar} ${!open.sidebar ? styles.closed : ""}`}>

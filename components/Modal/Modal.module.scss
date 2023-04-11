@@ -8,13 +8,15 @@
   .modalBackground {
     position: absolute;
     inset: 0;
+    height: 100%;
+    width: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 100;
+    backdrop-filter: blur(8px);
   }
 
   .modalContent {
     max-height: 70vh;
-    height: fit-content;
     width: 90%;
     max-width: 1000px;
     background-color: var(--gray);

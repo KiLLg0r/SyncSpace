@@ -15,7 +15,7 @@ import { BiLock } from "react-icons/bi";
 import { BsFacebook, BsGoogle } from "react-icons/bs";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
 
 // React hooks form
 import { useForm } from "react-hook-form";
@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import validateError from "@utils/errors";
 
 function Register() {
-  const createAccount = authStore((state) => state.createAccount);
+  const createAccount = useAuthStore((state) => state.createAccount);
   const router = useRouter();
 
   const {

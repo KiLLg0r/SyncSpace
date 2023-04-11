@@ -1,16 +1,13 @@
-"use client";
 import ProfileCard from "@components/ProfileCard";
-
-// Auth
-import authStore from "@store/authStore";
+import { cookies } from "next/headers";
 
 const Profile = () => {
-  const currentUser = authStore((state) => state.currentUser);
-  const username = currentUser?.displayName;
+  const cookieStore = cookies();
+  const username = cookieStore.get("username");
 
   return (
     <div style={{ padding: "1.5rem" }}>
-      <ProfileCard username={username} />
+      <ProfileCard username={username.value} />
     </div>
   );
 };

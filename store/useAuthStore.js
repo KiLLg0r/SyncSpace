@@ -13,7 +13,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 
-const authStore = create((set) => ({
+const useAuthStore = create((set) => ({
   currentUser: null,
   userData: null,
   createAccount: (email, password) => createUserWithEmailAndPassword(auth, email, password),
@@ -37,4 +37,4 @@ const authStore = create((set) => ({
   updateUserData: (data) => set({ userData: data }),
 }));
 
-export default authStore;
+export default useAuthStore;

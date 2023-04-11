@@ -2,8 +2,6 @@
 // Next / Reacts imports
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
 // Monaco Editor import
 import Editor from "@monaco-editor/react";
 
@@ -34,7 +32,7 @@ import useLanguages from "@hooks/useLanguages";
 import theme from "@utils/theme-dark.json";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
 
 // Hooks
 import useTree from "@hooks/useTree";
@@ -48,6 +46,9 @@ let awareness = null;
 let monacoBinding = null;
 
 const EditorComponent = ({ params }) => {
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const username = currentUser?.displayName;
+
   const [code, setCode] = useState("");
   const [editorRef, setEditorRef] = useState(null);
   const [tabs, setTabs] = useState({});
@@ -57,7 +58,7 @@ const EditorComponent = ({ params }) => {
   const [renamedNode, setRenamedNode] = useState(-1);
   const [explorerData, setExplorerData] = useState({});
   const [focus, setFocus] = useState({
-    path: `users/${params.username}/${params.projectname}/`,
+    path: `users/${username}/${params.projectName}/`,
     isFolder: true,
     input: {
       visible: false,
@@ -65,9 +66,7 @@ const EditorComponent = ({ params }) => {
     },
   });
 
-  const currentUser = authStore((state) => state.currentUser);
   const tabsContainerRef = useRef(null);
-  const router = useRouter();
 
   const { insertNode, createFileTree, orderTree, deleteNode, renameNode } = useTree();
   const { getLanguage } = useLanguages();
@@ -131,9 +130,6 @@ const EditorComponent = ({ params }) => {
       },
     });
   };
-
-  if (!currentUser || params.username !== currentUser?.displayName)
-    router.replace(`/${params.username}/${params.projectname}/`);
 
   const bindEditor = (ytext) => {
     if (monacoBinding) monacoBinding.destroy();
@@ -212,7 +208,7 @@ const EditorComponent = ({ params }) => {
   };
 
   const closeTab = (name) => {
-    setFocus({ ...focus, path: `users/${params.username}/${params.projectname}/` });
+    setFocus({ ...focus, path: `users/${username}/${params.projectName}/` });
     saveFile(name);
     const newObject = { ...tabs };
     delete newObject[name];
@@ -243,7 +239,7 @@ const EditorComponent = ({ params }) => {
   };
 
   const saveFile = (name, value = null) => {
-    const storageRef = ref(storage, `users/${params.username}/${params.projectname}/${name}`);
+    const storageRef = ref(storage, `users/${username}/${params.projectName}/${name}`);
     let data;
 
     if (value === null) {
@@ -261,20 +257,19 @@ const EditorComponent = ({ params }) => {
   useEffect(() => {
     if (Object.keys(explorerData).length === 0) {
       const data = createFileTree(
-        ref(storage, `users/${params.username}/${params.projectname}/`),
-        `users/${params.username}/${params.projectname}/`,
-        params.projectname,
+        ref(storage, `users/${username}/${params.projectName}/`),
+        `users/${username}/${params.projectName}/`,
+        params.projectName,
       );
       setExplorerData(data);
     }
-  }, [createFileTree, explorerData, params]);
+  }, [createFileTree, explorerData, params, username]);
 
   useEffect(() => {
     if (editorRef) {
       try {
         provider = new WebrtcProvider("monaco", ydocument, {
           signaling: ["wss://syncspace-websocket.herokuapp.com/"],
-          awareness: new awarenessProtocol.Awareness()
         });
         awareness = provider.awareness;
 
@@ -321,10 +316,10 @@ const EditorComponent = ({ params }) => {
       <header className={styles.header}>
         <div className={styles.leftSide}>
           <BsFolderFill className={styles.icon} />
-          {params.projectname}
+          {params.projectName}
         </div>
         <div className={styles.rightSide}>
-          <Link href={`/${params.username}/${params.projectname}`}>
+          <Link href={`/projects/${params.projectName}`}>
             Exit editing <BsBoxArrowLeft />
           </Link>
         </div>
@@ -335,8 +330,7 @@ const EditorComponent = ({ params }) => {
           onClick={(e) => {
             e.preventDefault();
             documentClick();
-            if (e.target === e.currentTarget)
-              setFocus({ ...focus, path: `users/${params.username}/${params.projectname}/` });
+            if (e.target === e.currentTarget) setFocus({ ...focus, path: `users/${username}/${params.projectName}/` });
           }}
         >
           <div className={styles.actionButtons}>

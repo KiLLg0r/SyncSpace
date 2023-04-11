@@ -1,0 +1,48 @@
+.projectData {
+  padding: 1rem;
+  width: 100%;
+
+  background-color: var(--gray-dark-200);
+  border-radius: 1rem;
+  margin-block: 1rem;
+
+  display: flex;
+  gap: 0.5rem;
+
+  .img {
+    width: clamp(2rem, 10vw, 10rem);
+    height: clamp(2rem, 10vw, 10rem);
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .text {
+    width: 100%;
+  }
+}
+
+.item {
+  margin-bottom: 0.5rem;
+
+  .label {
+    color: var(--gray-light-600);
+    font-weight: 300;
+    font-style: italic;
+  }
+}
+
+.aside {
+  .contributor {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .img {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+}

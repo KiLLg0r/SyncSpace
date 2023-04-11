@@ -3,13 +3,7 @@
 // Icons
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiSearchAlt } from "react-icons/bi";
-import {
-  BsFillPersonFill,
-  BsChevronDown,
-  BsBoxArrowLeft,
-  BsFillChatFill,
-  BsFillFolderFill,
-} from "react-icons/bs";
+import { BsFillPersonFill, BsChevronDown, BsBoxArrowLeft, BsFillChatFill, BsFillFolderFill } from "react-icons/bs";
 import { FaCog } from "react-icons/fa";
 
 // Styles
@@ -20,7 +14,7 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
 // Auth store
-import authStore from "@store/authStore";
+import useAuthStore from "@store/useAuthStore";
 
 const Navigation = () => {
   const buttonRef = useRef(null);
@@ -30,8 +24,8 @@ const Navigation = () => {
 
   const [open, setOpen] = useState(false);
 
-  const currentUser = authStore((state) => state.currentUser);
-  const logout = authStore((state) => state.logout);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const logout = useAuthStore((state) => state.logout);
 
   const toggleDropdown = () => {
     let menuTop = chevronRef?.current?.getBoundingClientRect()?.top - buttonRef?.current?.getBoundingClientRect()?.top;
