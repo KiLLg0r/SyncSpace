@@ -135,7 +135,7 @@ const Sidebar = () => {
           <div className={styles.dropdownContent}>
             {projects.length > 0 &&
               projects.map((project) => (
-                <div key={project.lastModified} className={styles.project}>
+                <Link href={`/projects/${project.name}`} key={project.lastModified} className={styles.project}>
                   <div className={styles.img}>
                     <Image src={project.img} alt={`${project.name} image`} fill style={{ objectFit: "cover" }} />
                   </div>
@@ -143,7 +143,7 @@ const Sidebar = () => {
                   <div className={styles.tooltip}>
                     <div className={styles.tooltipText}>{project.name}</div>
                   </div>
-                </div>
+                </Link>
               ))}
 
             {areMoreProject && (

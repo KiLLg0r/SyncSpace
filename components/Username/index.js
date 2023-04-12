@@ -52,15 +52,19 @@ const Username = ({ children }) => {
     } else {
       updateProfile(currentUser, {
         displayName: data.username,
-      }).catch((error) => alert(error));
+        photoURL: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
+      })
+        .then(() => console.log("Username set succesfully"))
+        .catch((error) => alert(error));
 
       await setDoc(doc(db, "users", data.username), {
         name: data.username,
+        img: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
       }).catch((error) => alert(error));
 
       setOpenModal(false);
 
-      router.replace("/");
+      router.push("/");
     }
   };
 
