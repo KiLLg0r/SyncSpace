@@ -1,0 +1,15 @@
+.home {
+  background-color: black;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .container{
+    border-radius: 10px;
+    width: 60%;
+    height: 80%;
+    display: flex;
+    overflow: hidden;
+  }
+}
