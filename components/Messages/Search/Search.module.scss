@@ -1,23 +1,24 @@
-.search{
-  border-bottom: 1px solid gray;
+.search {
+  border-bottom: 1px solid var(--gray-light-50);
+  padding: 0.28125rem 0;
 
-  .searchForm{
+  .searchForm {
     padding: 10px;
 
-    input{
+    input {
       background-color: transparent;
       border: none;
       color: white;
       outline: none;
-      
-      &::placeholder{
+
+      &::placeholder {
         color: lightgray;
       }
     }
   }
 }
 
-.userChat{
+.userChat {
   padding: 10px;
   display: flex;
   align-items: center;
@@ -25,24 +26,24 @@
   color: white;
   cursor: pointer;
 
-  &:hover{
-    background-color: darkorange;
+  &:hover {
+    background-color: var(--gray);
   }
 
-  img{
+  img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
   }
 
-  .userChatInfo{
-    span{
+  .userChatInfo {
+    span {
       font-size: 18px;
       font-weight: 500;
     }
 
-    p{
+    p {
       font-size: 14px;
       color: lightgrey;
     }
