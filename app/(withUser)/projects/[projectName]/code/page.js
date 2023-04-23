@@ -295,7 +295,7 @@ const EditorComponent = ({ params }) => {
         }
       };
     }
-  }, [currentUser, editorRef]);
+  }, [currentUser, editorRef, params.projectName, username]);
 
   useEffect(() => {
     const save = setInterval(() => {
