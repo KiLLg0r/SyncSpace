@@ -24,10 +24,10 @@
   }
 
   .login-card {
-    width: 450px;
+    width: 43.125rem;
     background: rgba(255, 255, 255, 0.5);
     padding: 4rem;
-    border-radius: 10px;
+    border-radius: 0.625rem;
     position: relative;
     z-index: 1;
     margin-inline: auto;
@@ -170,8 +170,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 50px;
-        height: 50px;
+        width: 3.125rem;
+        height: 3.125rem;
         background: rgba(255, 255, 255, 0.6);
         border-radius: 100px;
         transition: all 0.5s;

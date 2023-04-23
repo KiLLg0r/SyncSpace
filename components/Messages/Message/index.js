@@ -1,15 +1,17 @@
 import styles from "./Message.module.scss";
+import Image from "next/image";
 
-const Message = () => {
+const Message = ({ message, img, time, name, owner }) => {
   return (
-    <div className={`${styles.message} `}>
+    <div className={`${styles.message} ${owner ? styles.owner : ""}`}>
       <div className={styles.messageInfo}>
-        <img src="planet.svg" alt="icon" />
-        <span>Just now</span>
+        <div className={styles.img}>
+          <Image src={img} alt={`${name}'s profile image`} style={{ objectFit: "cover" }} sizes={"10rem"} fill={true} />
+        </div>
+        <span>{time}</span>
       </div>
       <div className={styles.messageContent}>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed est</p>
-        {/* <img src="planet.svg" alt="icon" /> */}
+        <p>{message}</p>
       </div>
     </div>
   );

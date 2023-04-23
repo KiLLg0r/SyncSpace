@@ -1,38 +1,51 @@
-.input{
-  height: 50px;
-  background-color: white;
-  padding: 20px;
+.input {
+  height: 2rem;
+  background-color: var(--gray-light-100);
+  padding: 1.25rem 0.5rem 1.25rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  input{
+  input {
+    background-color: transparent;
     width: 100%;
     border: none;
     outline: none;
-    color: blue;
-    font-size: 18px;
+    color: var(--accent);
+    font-size: 1.025rem;
 
-    &::placeholder{
+    &::placeholder {
       color: lightgray;
     }
   }
 
-  .send{
+  .send {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.625rem;
 
-    img{
-      height: 24px;
+    svg {
+      font-size: 1.125rem;
       cursor: pointer;
+      color: var(--gray-light-500);
+
+      &:hover {
+        color: var(--gray-light-900);
+        transform: scale(1.1);
+      }
     }
 
-    button{
+    button {
       border: none;
-      padding: 10px 15px;
-      color: white;
-      background-color: red;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      color: var(--gray-dark-900);
+      background-color: var(--accent);
+      border-radius: 0.5rem;
+
+      &:hover {
+        background-color: var(--accent-dark);
+      }
     }
   }
 }

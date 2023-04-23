@@ -1,7 +1,7 @@
 import Messages from "@components/Messages";
 
 const page = () => {
-  return ( <Messages/> );
-}
- 
+  return <Messages />;
+};
+
 export default page;

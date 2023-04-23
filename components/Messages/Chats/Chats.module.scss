@@ -1,11 +1,12 @@
 .userChat {
-  padding: 10px;
+  padding: 0.625rem;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   color: white;
   cursor: pointer;
   transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  position: relative;
 
   &:hover {
     background-color: var(--gray);
@@ -14,22 +15,22 @@
     }
   }
 
-  img {
-    width: 50px;
-    height: 50px;
+  .userChatImg {
+    position: relative;
+    width: 3.125rem;
+    height: 3.125rem;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
   }
 
   .userChatInfo {
-    
     span {
-      font-size: 18px;
+      font-size: 1.125rem;
       font-weight: 500;
     }
 
     p {
-      font-size: 14px;
+      font-size: 0.875rem;
       color: lightgrey;
     }
   }

@@ -1,9 +1,8 @@
 .search {
   border-bottom: 1px solid var(--gray-light-50);
-  padding: 0.28125rem 0;
 
   .searchForm {
-    padding: 10px;
+    padding: 0.875rem;
 
     input {
       background-color: transparent;
@@ -19,10 +18,10 @@
 }
 
 .userChat {
-  padding: 10px;
+  padding: 0.625rem;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   color: white;
   cursor: pointer;
 
@@ -31,20 +30,20 @@
   }
 
   img {
-    width: 50px;
-    height: 50px;
+    width: 3.125rem;
+    height: 3.125rem;
     border-radius: 50%;
     object-fit: cover;
   }
 
   .userChatInfo {
     span {
-      font-size: 18px;
+      font-size: 1.125rem;
       font-weight: 500;
     }
 
     p {
-      font-size: 14px;
+      font-size: 0.875rem;
       color: lightgrey;
     }
   }
