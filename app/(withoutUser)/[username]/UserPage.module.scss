@@ -1,0 +1,23 @@
+.userPage {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .profile {
+    margin-top: 0.5rem;
+  }
+
+  .projects {
+    height: 100%;
+
+    .title {
+      color: var(--accent);
+    }
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .userPage {
+    flex-direction: row;
+  }
+}

@@ -8,6 +8,8 @@ import { db } from "@config/firebase";
 // Components
 import ProgrammingLanguages from "@components/ProgrammingLanguages";
 
+import Link from "next/link";
+
 const getProfileImages = async (contributors = []) => {
   const promises = contributors.map(async (contributor) => {
     const docRef = doc(db, "users", contributor);
@@ -37,7 +39,7 @@ export const SideProjectData = async ({ projectData }) => {
         <div className={styles.item}>
           <div className={styles.label}>Contributors</div>
           {projectData.contributors.map((contributor, index) => (
-            <div className={styles.contributor} key={index}>
+            <Link href={`/${contributor}`} className={styles.contributor} key={index}>
               <div className={styles.img}>
                 <Image
                   src={contributorsIMGs[index]}
@@ -48,7 +50,7 @@ export const SideProjectData = async ({ projectData }) => {
                 />
               </div>
               <div className={styles.name}>{contributor}</div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
