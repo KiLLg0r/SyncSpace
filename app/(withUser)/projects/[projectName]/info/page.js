@@ -10,7 +10,7 @@ import useAuthStore from "@store/useAuthStore";
 import { useEffect, useState, useRef } from "react";
 
 // Firebase
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import { doc, updateDoc, serverTimestamp, getDoc } from "firebase/firestore";
 import { db, storage } from "@config/firebase";
 import { ref, uploadBytes, uploadString, getDownloadURL } from "firebase/storage";
 
@@ -30,8 +30,9 @@ import placeholder from "placeholder.js";
 import { BsLockFill, BsPeopleFill } from "react-icons/bs";
 
 const Info = ({ params }) => {
-  const user = useAuthStore((state) => state.currentUser);
-  const username = user?.displayName;
+  const projects = useAuthStore((state) => state.projects);
+  const project = projects.find((o) => o.name === params.projectName);
+  const username = project.owner;
 
   const [projectData, setProjectData] = useState({});
 
@@ -52,23 +53,14 @@ const Info = ({ params }) => {
     const storageRef = ref(storage, `/users/${username}/projects/${projectName}`);
 
     if (image) await uploadBytes(storageRef, image);
-    else
-      await uploadString(
-        storageRef,
-        placeholder.getData({ size: "1024x1024", bgcolor: "#ff8d0a", color: "#08090a", text: projectName }),
-        "data_url",
-      );
 
     getDownloadURL(storageRef)
       .then(async (url) => {
-        await setDoc(doc(db, "users", `${username}/projects/${projectName}`), {
+        await updateDoc(doc(db, "users", `${username}/projects/${projectName}`), {
           name: projectName,
           description: projectDesc,
           visibility: visibility,
-          owner: username,
           img: url,
-          lastModified: serverTimestamp(),
-          contributors: [username],
         })
           .then()
           .catch((error) => alert(error));
@@ -88,6 +80,7 @@ const Info = ({ params }) => {
       getProjectData().then((res) => {
         setValue("projectName", res?.name);
         setValue("projectDesc", res?.description);
+        setValue("visibility", res?.visibility);
         setProjectData(res);
       });
   }, [params.projectName, projectData, setValue, username]);
@@ -184,13 +177,7 @@ const Info = ({ params }) => {
 
         <div>
           <label htmlFor="visibilityPublic" className={styles.radioLabel}>
-            <input
-              id="visibilityPublic"
-              {...register("visibility", { required: true })}
-              type="radio"
-              value="public"
-              defaultChecked={projectData?.visibility === "public" && true}
-            />
+            <input id="visibilityPublic" {...register("visibility", { required: true })} type="radio" value="public" />
             <div className={styles.icon}>
               <BsPeopleFill />
             </div>
@@ -206,7 +193,6 @@ const Info = ({ params }) => {
               {...register("visibility", { required: true })}
               type="radio"
               value="private"
-              defaultChecked={projectData?.visibility === "private" && true}
             />
             <div className={styles.icon}>
               <BsLockFill />

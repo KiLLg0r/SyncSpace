@@ -22,7 +22,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Upload = ({ params }) => {
-  const currentUser = useAuthStore((state) => state.currentUser);
+  const projects = useAuthStore((state) => state.projects);
+  const project = projects.find((o) => o.name === params.projectName);
 
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
@@ -185,7 +186,7 @@ const Upload = ({ params }) => {
 
   const uploadFiles = async () => {
     const { projectName } = params;
-    const username = currentUser?.displayName;
+    const username = project.owner;
     const projectRef = ref(storage, `users/${username}/${projectName}/`);
 
     const promise = new Promise((resolve) => {

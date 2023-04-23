@@ -16,6 +16,7 @@ import {
 const useAuthStore = create((set) => ({
   currentUser: null,
   userData: null,
+  projects: [],
   createAccount: (email, password) => createUserWithEmailAndPassword(auth, email, password),
   login: (email, password) => signInWithEmailAndPassword(auth, email, password),
   logout: () => signOut(auth),
@@ -35,6 +36,7 @@ const useAuthStore = create((set) => ({
   sendUserPasswordResetEmail: (email) => sendPasswordResetEmail(auth, email),
   updateUser: (user) => set({ currentUser: user }),
   updateUserData: (data) => set({ userData: data }),
+  updateProjects: (data) => set({ projects: data }),
 }));
 
 export default useAuthStore;

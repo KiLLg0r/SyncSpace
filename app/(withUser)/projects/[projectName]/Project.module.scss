@@ -156,6 +156,24 @@
 .projectPage {
   padding: 1.25rem;
 
+  .noProjects {
+    font-size: 1.125rem;
+    font-weight: 600;
+    height: 80vh;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    svg {
+      display: block;
+      margin-inline: auto;
+      max-width: 20rem;
+      margin-bottom: 1rem;
+    }
+  }
+
   .title {
     font-size: 2rem;
     color: var(--accent);

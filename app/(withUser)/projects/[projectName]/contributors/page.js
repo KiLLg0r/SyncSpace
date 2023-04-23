@@ -56,8 +56,9 @@ const Contributors = ({ params }) => {
   const [openAddContributors, setOpenAddContributors] = useState(false);
   const [result, setResult] = useState([]);
 
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const username = currentUser?.displayName;
+  const projects = useAuthStore((state) => state.projects);
+  const project = projects.find((o) => o.name === params.projectName);
+  const username = project.owner;
 
   useEffect(() => {
     const getInitialContrs = async () => {

@@ -8,7 +8,7 @@ const ProjectsPage = async () => {
   return (
     <div style={{ padding: "1.25rem" }}>
       <h2>My projects</h2>
-      {username !== undefined && <Projects username={username.value} owner={true} inDashboard={true} />}
+      {username !== undefined && <Projects username={username.value} inDashboard={true} />}
     </div>
   );
 };

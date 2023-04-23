@@ -1,12 +1,16 @@
-import { cookies } from "next/headers";
+"use client";
 
 // Components
 import SourceCode from "@components/SourceCode";
 
+// Store
+import useAuthStore from "@store/useAuthStore";
+
 const Project = ({ params }) => {
-  const cookieStore = cookies();
-  const username = cookieStore.get("username");
-  return <SourceCode username={username?.value} projectname={params.projectName} />;
+  const projects = useAuthStore((state) => state.projects);
+  const project = projects.find((o) => o.name === params.projectName);
+
+  return <SourceCode username={project.owner} projectname={params.projectName} />;
 };
 
 export default Project;

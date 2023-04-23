@@ -47,7 +47,10 @@ let monacoBinding = null;
 
 const EditorComponent = ({ params }) => {
   const currentUser = useAuthStore((state) => state.currentUser);
-  const username = currentUser?.displayName;
+
+  const projects = useAuthStore((state) => state.projects);
+  const project = projects.find((o) => o.name === params.projectName);
+  const username = project.owner;
 
   const [code, setCode] = useState("");
   const [editorRef, setEditorRef] = useState(null);
@@ -268,7 +271,7 @@ const EditorComponent = ({ params }) => {
   useEffect(() => {
     if (editorRef) {
       try {
-        provider = new WebrtcProvider("monaco", ydocument, {
+        provider = new WebrtcProvider(`${username}/${params.projectName}`, ydocument, {
           signaling: ["wss://syncspace-websocket.herokuapp.com/"],
         });
         awareness = provider.awareness;
@@ -280,7 +283,7 @@ const EditorComponent = ({ params }) => {
           color: randomcolor,
         });
 
-        console.log("Connected to room 1");
+        console.log(`${username}/${params.projectName}`);
       } catch (error) {
         throw new Error(error);
       }

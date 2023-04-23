@@ -1,5 +1,5 @@
 import { db } from "@config/firebase";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collectionGroup, where, query } from "firebase/firestore";
 
 import ProjectCard from "@components/ProjectCard";
 import styles from "./Projects.module.scss";
@@ -7,7 +7,8 @@ import Empty from "@public/empty.svg";
 
 const getProjects = async (username) => {
   try {
-    const documentsRef = await getDocs(collection(db, "users", username, "projects"));
+    const q = query(collectionGroup(db, "projects"), where("contributors", "array-contains", username));
+    const documentsRef = await getDocs(q);
     const documents = Promise.all(documentsRef.docs.map((doc) => doc.data()));
     return documents;
   } catch (error) {
@@ -16,18 +17,18 @@ const getProjects = async (username) => {
   }
 };
 
-const Projects = async ({ username, owner = false, inDashboard = false }) => {
+const Projects = async ({ username, inDashboard = false }) => {
   const projects = await getProjects(username);
 
   return projects.length > 0 ? (
     <div className={styles.projects}>
       {projects.map((project) => {
-        if (project.visibility === "public" || owner)
+        if (project.visibility === "public" || inDashboard)
           return (
             <ProjectCard
               key={project.lastModified.seconds}
               projectData={project}
-              username={username}
+              username={project.owner}
               inDashboard={inDashboard}
             />
           );

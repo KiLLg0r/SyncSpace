@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 // Firebase
-import { getDocs, query, collection, limit, startAfter } from "firebase/firestore";
+import { getDocs, query, collection, limit, startAfter, collectionGroup, where } from "firebase/firestore";
 import { db } from "@config/firebase";
 import Image from "next/image";
 
@@ -50,7 +50,12 @@ const Sidebar = () => {
   const toggleProjects = () => setOpen({ ...open, projects: !open.projects });
 
   const loadMoreProjects = async () => {
-    const next = query(collection(db, "users", username, "projects"), limit(5), startAfter(lastProject));
+    const next = query(
+      collectionGroup(db, "projects"),
+      where("contributors", "array-contains", username),
+      limit(5),
+      startAfter(lastProject),
+    );
     const documentSnapshots = await getDocs(next);
 
     const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
@@ -65,7 +70,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     const getProjects = async () => {
-      const first = query(collection(db, "users", username, "projects"), limit(5));
+      const first = query(collectionGroup(db, "projects"), where("contributors", "array-contains", username), limit(5));
       const documentSnapshots = await getDocs(first);
 
       const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
