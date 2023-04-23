@@ -20,7 +20,8 @@
       color: var(--accent);
     }
 
-    .rightSide a {
+    .rightSide {
+      cursor: pointer;
       padding: 0.5rem 1rem;
       background-color: var(--red);
       border-radius: 1rem;

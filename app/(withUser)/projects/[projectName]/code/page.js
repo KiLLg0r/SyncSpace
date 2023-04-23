@@ -1,7 +1,8 @@
 "use client";
 // Next / Reacts imports
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 // Monaco Editor import
 import Editor from "@monaco-editor/react";
 
@@ -15,6 +16,7 @@ import randomColor from "randomcolor";
 
 // Styles
 import styles from "./Editor.module.scss";
+
 // Icons
 import { BsFolderFill, BsBoxArrowLeft, BsFolderPlus, BsFilePlus } from "react-icons/bs";
 
@@ -68,6 +70,8 @@ const EditorComponent = ({ params }) => {
       isFolder: false,
     },
   });
+
+  const router = useRouter();
 
   const tabsContainerRef = useRef(null);
 
@@ -257,6 +261,14 @@ const EditorComponent = ({ params }) => {
       .catch((error) => console.log(error));
   };
 
+  const saveAll = () => {
+    Object.keys(tabs).forEach((key) => {
+      saveFile(key);
+    });
+
+    router.push(`/projects/${params.projectName}`);
+  };
+
   useEffect(() => {
     if (Object.keys(explorerData).length === 0) {
       const data = createFileTree(
@@ -321,10 +333,8 @@ const EditorComponent = ({ params }) => {
           <BsFolderFill className={styles.icon} />
           {params.projectName}
         </div>
-        <div className={styles.rightSide}>
-          <Link href={`/projects/${params.projectName}`}>
-            Exit editing <BsBoxArrowLeft />
-          </Link>
+        <div className={styles.rightSide} onClick={saveAll}>
+          Exit editing <BsBoxArrowLeft />
         </div>
       </header>
       <main>
