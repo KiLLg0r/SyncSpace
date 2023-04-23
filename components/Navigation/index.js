@@ -3,8 +3,7 @@
 // Icons
 import { GiRingedPlanet } from "react-icons/gi";
 import { BiSearchAlt } from "react-icons/bi";
-import { BsFillPersonFill, BsChevronDown, BsBoxArrowLeft, BsFillChatFill, BsFillFolderFill } from "react-icons/bs";
-import { FaCog } from "react-icons/fa";
+import { BsFillPersonFill, BsChevronDown, BsBoxArrowLeft, BsFillGrid1X2Fill } from "react-icons/bs";
 
 // Styles
 import styles from "./Nav.module.scss";
@@ -12,6 +11,7 @@ import styles from "./Nav.module.scss";
 // React / Next
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Auth store
 import useAuthStore from "@store/useAuthStore";
@@ -23,6 +23,9 @@ const Navigation = () => {
   const dropdownRef = useRef(null);
 
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const router = useRouter();
 
   const currentUser = useAuthStore((state) => state.currentUser);
   const logout = useAuthStore((state) => state.logout);
@@ -61,8 +64,16 @@ const Navigation = () => {
       </Link>
       <div className={styles.center}>
         <div className={styles.search}>
-          <input type="text" placeholder="Search for projects..." />
-          <div className={styles.icon}>
+          <input
+            type="text"
+            placeholder="Search for projects or users..."
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") router.push(`/search?q=${search}`);
+              else if (e.key === "Esc") setSearch("");
+            }}
+          />
+          <div className={styles.icon} onClick={() => router.push(`/search?q=${search}`)}>
             <BiSearchAlt />
           </div>
         </div>
@@ -82,20 +93,10 @@ const Navigation = () => {
               </div>
             </button>
             <div ref={menuRef} className={styles.menu}>
-              <Link href={`/${currentUser?.displayName}`} className={styles.menuItem}>
+              <Link href="/" className={styles.menuItem}>
                 <button>
-                  <BsFillFolderFill />
-                  Projects
-                </button>
-              </Link>
-              <button className={styles.menuItem}>
-                <BsFillChatFill />
-                Chat
-              </button>
-              <Link href="/settings" className={styles.menuItem}>
-                <button>
-                  <FaCog />
-                  Settings
+                  <BsFillGrid1X2Fill />
+                  Dashboard
                 </button>
               </Link>
               <button onClick={logout} className={styles.menuItem}>
