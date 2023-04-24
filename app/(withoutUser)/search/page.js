@@ -17,7 +17,6 @@ import { useSearchParams } from "next/navigation";
 const getUsers = async (searchQuery) => {
   try {
     const documentsRef = await getDocs(collection(db, "users"));
-    console.log(documentsRef.docs);
     const documents = await Promise.all(
       documentsRef.docs.map(async (doc) => {
         if (doc.id.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -84,7 +83,7 @@ const Search = () => {
       if (projectsQuery) getProjects(searchQuery).then((res) => setProjects(res));
       if (usersQuery) getUsers(searchQuery).then((res) => setUsers(res));
     }
-  }, [searchParams]);
+  });
 
   return (
     <div className={styles.searchPage}>

@@ -41,7 +41,7 @@ const Messages = () => {
             owner={message.sender !== name}
             message={message.message}
             img={message.senderIMG}
-            time={message.sendTime?.seconds}
+            time={message.sendTime}
             name={message.sender}
           />
         ))}

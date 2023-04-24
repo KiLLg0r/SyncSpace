@@ -29,11 +29,13 @@
     background-color: var(--gray);
   }
 
-  img {
+  .userChatImg {
+    position: relative;
     width: 3.125rem;
     height: 3.125rem;
     border-radius: 50%;
     object-fit: cover;
+    overflow: hidden;
   }
 
   .userChatInfo {
