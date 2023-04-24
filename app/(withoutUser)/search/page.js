@@ -18,17 +18,16 @@ const getUsers = async (searchQuery) => {
   try {
     const documentsRef = await getDocs(collection(db, "users"));
     console.log(documentsRef.docs);
-    const documents = Promise.all(
-      documentsRef.docs.map(
-        (doc) =>
-          doc.id.toLowerCase().includes(searchQuery.toLowerCase()) && {
-            name: doc.data().name,
-            img: doc.data().img,
-            bio: doc.data().bio,
-          },
-      ),
+    const documents = await Promise.all(
+      documentsRef.docs.map(async (doc) => {
+        if (doc.id.toLowerCase().includes(searchQuery.toLowerCase())) {
+          const { name, img, bio } = doc.data();
+          return { name, img, bio };
+        }
+        return null;
+      }),
     );
-    return documents;
+    return documents.filter((doc) => doc !== null);
   } catch (error) {
     console.error(error);
     return [];
@@ -39,16 +38,15 @@ const getProjects = async (searchQuery) => {
   try {
     const q = query(collectionGroup(db, "projects"));
     const documentsRef = await getDocs(q);
-    const documents = Promise.all(
-      documentsRef.docs.map(
-        (doc) =>
-          doc.data().name.toLowerCase().includes(searchQuery.toLowerCase()) && {
-            id: doc.id,
-            ...doc.data(),
-          },
-      ),
+    const documents = await Promise.all(
+      documentsRef.docs.map(async (doc) => {
+        if (doc.data().name.toLowerCase().includes(searchQuery.toLowerCase())) {
+          return { id: doc.id, ...doc.data() };
+        }
+        return null;
+      }),
     );
-    return documents;
+    return documents.filter((doc) => doc !== null);
   } catch (error) {
     console.error(error);
     return [];
@@ -126,7 +124,7 @@ const Search = () => {
         </form>
       </aside>
       <div className={styles.result}>
-        {searchParams.get("users") === "true" && (
+        {(!searchParams.has("users") || searchParams.get("users") === "true") && (
           <div className={styles.result__users}>
             <h3>Users</h3>
             <div className={styles.result__users__list}>
@@ -153,7 +151,7 @@ const Search = () => {
             </div>
           </div>
         )}
-        {searchParams.get("projects") === "true" && (
+        {(!searchParams.has("projects") || searchParams.get("projects") === "true") && (
           <div className={styles.result__projects}>
             <h3>Projects</h3>
             <div className={styles.result__projects__list}>
