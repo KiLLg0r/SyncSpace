@@ -72,7 +72,7 @@ const New = () => {
           contributors: [user]
         })
           .then(() => {
-            router.push(`/${user}/${projectName}`);
+            router.push(`/projects/${projectName}`);
           })
           .catch((error) => alert(error));
       })
