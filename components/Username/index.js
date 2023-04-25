@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Firestore
-import { db } from "@config/firebase";
+import auth, { db } from "@config/firebase";
 
 // React
 import { useState } from "react";
@@ -50,7 +50,7 @@ const Username = ({ children }) => {
     if (docSnapshot.exists()) {
       setError("username", { type: "taken", message: "This username is taken. Try something else!" });
     } else {
-      updateProfile(currentUser, {
+      updateProfile(auth.currentUser, {
         displayName: data.username,
         photoURL: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
       })
@@ -61,7 +61,9 @@ const Username = ({ children }) => {
         name: data.username,
         img: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
         bio: "",
-      }).catch((error) => alert(error));
+      })
+        .then()
+        .catch((error) => alert(error));
 
       setOpenModal(false);
 
