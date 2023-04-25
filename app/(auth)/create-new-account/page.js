@@ -56,8 +56,6 @@ function Register() {
     }
   };
 
-  console.log(errors);
-
   return (
     <div className={styles.background}>
       <div className={styles["login-card-container"]}>

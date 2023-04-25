@@ -47,6 +47,8 @@ const Username = ({ children }) => {
     const userRef = doc(db, "users", data.username);
     const docSnapshot = await getDoc(userRef);
 
+    console.log("User not found", auth.currentUser, data);
+
     if (docSnapshot.exists()) {
       setError("username", { type: "taken", message: "This username is taken. Try something else!" });
     } else {
@@ -54,20 +56,20 @@ const Username = ({ children }) => {
         displayName: data.username,
         photoURL: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
       })
-        .then(() => console.log("Username set succesfully"))
+        .then(async () => {
+          console.log("Username set succesfully");
+          await setDoc(doc(db, "users", data.username), {
+            name: data.username,
+            img: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
+            bio: "",
+          })
+            .then(() => {
+              setOpenModal(false);
+              router.push("/");
+            })
+            .catch((error) => alert(error));
+        })
         .catch((error) => alert(error));
-
-      await setDoc(doc(db, "users", data.username), {
-        name: data.username,
-        img: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
-        bio: "",
-      })
-        .then()
-        .catch((error) => alert(error));
-
-      setOpenModal(false);
-
-      router.push("/");
     }
   };
 
@@ -82,9 +84,21 @@ const Username = ({ children }) => {
           placeholder="Set your username"
           type="text"
           aria-invalid={errors.username ? "true" : "false"}
-          {...register("username", { required: true, min: 3, pattern: /^[A-Za-z][A-Za-z0-9_-]{7,29}$/i })}
+          {...register("username", { required: true, min: 3, pattern: /^[A-Za-z][A-Za-z0-9_-]{2,29}$/i })}
         />
         <AnimatePresence>
+          {errors.username?.type === "pattern" && (
+            <motion.p
+              role="alert"
+              className={errorStyles.error}
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+            >
+              The given username do not respect the pattern. The username can only contain lower and upper case letters
+              of the English alphabet, as well as numbers.
+            </motion.p>
+          )}
           {errors.username?.type === "required" && (
             <motion.p
               role="alert"
