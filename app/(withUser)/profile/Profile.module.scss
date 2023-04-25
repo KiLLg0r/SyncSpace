@@ -1,0 +1,113 @@
+.profileCard {
+  max-width: 300px;
+  width: 100%;
+  .imageContainer {
+    position: relative;
+
+    .icon {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      width: 3rem;
+      height: 3rem;
+      background-color: var(--accent);
+      color: var(--foreground);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      visibility: hidden;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+      &:hover {
+        background: var(--accent-dark);
+      }
+
+      svg {
+        display: block;
+        height: 1.5rem;
+        width: 1.5rem;
+      }
+    }
+  }
+
+  .imageEdit {
+    margin-inline: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    width: 300px;
+    height: 300px;
+    position: relative;
+    margin-bottom: 1rem;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+    &.img {
+      border: 2px solid var(--accent);
+
+      img {
+        border-radius: 50%;
+        width: calc(300px - 1rem) !important;
+        height: calc(300px - 1rem) !important;
+        margin: auto;
+      }
+    }
+  }
+
+  .name {
+    color: var(--accent);
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--gray);
+    color: var(--foreground);
+    border: none;
+    font-size: 1.125rem;
+    border: 1px solid var(--accent);
+    border-radius: 0.5rem;
+
+    &:disabled {
+      all: unset;
+      width: 100%;
+      font-size: 1.125rem;
+    }
+  }
+
+  textarea {
+    display: block !important;
+    resize: none;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    .edit,
+    .cancel,
+    .save {
+      all: unset;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+    }
+
+    .edit,
+    .cancel {
+      background: var(--gray-light-300);
+      &:hover {
+        background: var(--gray-light-50);
+      }
+    }
+
+    .save {
+      background: var(--accent);
+      color: var(--gray-dark-800);
+
+      &:hover {
+        background: var(--accent-dark);
+        color: var(--foreground);
+      }
+    }
+  }
+}

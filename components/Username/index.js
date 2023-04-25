@@ -60,6 +60,7 @@ const Username = ({ children }) => {
       await setDoc(doc(db, "users", data.username), {
         name: data.username,
         img: "https://www.odonovan.co.uk/wp-content/uploads/2018/05/Placeholder-image.jpg",
+        bio: "",
       }).catch((error) => alert(error));
 
       setOpenModal(false);
