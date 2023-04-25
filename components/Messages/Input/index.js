@@ -45,16 +45,14 @@ const Input = () => {
 
   return (
     <div className={styles.input}>
-      <input type="text" placeholder="Type something..." value={message} onChange={(e) => setMessage(e.target.value)} />
+      <input
+        type="text"
+        placeholder="Type something..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && sendMessage(e)}
+      />
       <div className={styles.send}>
-        <input type="file" style={{ display: "none" }} id="file" />
-        <label htmlFor="file">
-          <BsPaperclip />
-        </label>
-        <input type="file" style={{ display: "none" }} id="img" accept={"image/*"} />
-        <label htmlFor="img">
-          <BsImages />
-        </label>
         <button type="button" onClick={sendMessage}>
           Send
         </button>

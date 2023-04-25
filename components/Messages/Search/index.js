@@ -41,11 +41,12 @@ const Search = ({ isSearching, changeSearching }) => {
   };
 
   const handleKey = (e) => {
-    e.keyCode === 13 && handleSearch();
-    if (e.keyCode === 27) {
+    e.key === "Enter" && handleSearch();
+    if (e.key === "Escape") {
       setUsers([]);
       setUsername("");
       changeSearching(false);
+      setError(false);
     }
   };
 
@@ -94,7 +95,7 @@ const Search = ({ isSearching, changeSearching }) => {
           value={username}
         />
       </div>
-      {error && <span>User not found!</span>}
+      {error && <span style={{ paddingLeft: "0.5rem" }}>User not found!</span>}
       {isSearching &&
         users.length > 0 &&
         users.map((user) => (

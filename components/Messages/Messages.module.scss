@@ -1,15 +1,7 @@
-.home {
-  background-color: black;
-  height: 100vh;
+.container {
+  border-radius: 0.625rem 0 0 0;
+  width: 17rem;
+  height: 50vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .container {
-    border-radius: 0.625rem;
-    width: 60%;
-    height: 80%;
-    display: flex;
-    overflow: hidden;
-  }
+  overflow: hidden;
 }

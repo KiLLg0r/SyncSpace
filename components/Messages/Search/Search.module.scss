@@ -31,8 +31,8 @@
 
   .userChatImg {
     position: relative;
-    width: 3.125rem;
-    height: 3.125rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
     object-fit: cover;
     overflow: hidden;
@@ -40,13 +40,8 @@
 
   .userChatInfo {
     span {
-      font-size: 1.125rem;
+      font-size: 0.825rem;
       font-weight: 500;
-    }
-
-    p {
-      font-size: 0.875rem;
-      color: lightgrey;
     }
   }
 }

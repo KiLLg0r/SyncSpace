@@ -61,7 +61,6 @@ const Chats = () => {
               </div>
               <div className={styles.userChatInfo}>
                 <span>{conversation?.users[userIndex]}</span>
-                <p>{conversation.lastMessage}</p>
               </div>
             </div>
           );

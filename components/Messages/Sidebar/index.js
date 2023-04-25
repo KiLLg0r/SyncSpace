@@ -5,15 +5,21 @@ import Search from "@components/Messages/Search";
 import Chats from "@components/Messages/Chats";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 const Sidebar = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   return (
-    <div className={styles.sidebar}>
-      <Search changeSearching={setIsSearching} isSearching={isSearching}/>
+    <motion.div
+      initial={{ opacity: 0, x: "17rem" }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: "17rem" }}
+      className={styles.sidebar}
+    >
+      <Search changeSearching={setIsSearching} isSearching={isSearching} />
       {!isSearching && <Chats />}
-    </div>
+    </motion.div>
   );
 };
 

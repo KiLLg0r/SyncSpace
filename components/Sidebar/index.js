@@ -5,8 +5,7 @@ import styles from "./Sidebar.module.scss";
 
 // Icons
 import { GiRingedPlanet } from "react-icons/gi";
-import { BsFolder, BsChatRightDots, BsBoxArrowLeft, BsPersonCircle, BsChevronUp, BsPlus } from "react-icons/bs";
-import { HiOutlineCog8Tooth } from "react-icons/hi2";
+import { BsFolder, BsBoxArrowLeft, BsPersonCircle, BsChevronUp, BsPlus } from "react-icons/bs";
 
 // React / Next
 import { useState, useEffect } from "react";
@@ -19,7 +18,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 // Firebase
-import { getDocs, query, collection, limit, startAfter, collectionGroup, where } from "firebase/firestore";
+import { getDocs, query, limit, startAfter, collectionGroup, where } from "firebase/firestore";
 import { db } from "@config/firebase";
 import Image from "next/image";
 
@@ -35,8 +34,6 @@ const Sidebar = () => {
   const links = [
     { name: "My profile", icon: <BsPersonCircle />, path: "/profile" },
     { name: "My projects", icon: <BsFolder />, path: "/projects" },
-    { name: "My messages", icon: <BsChatRightDots />, path: "/messages" },
-    { name: "Settings", icon: <HiOutlineCog8Tooth />, path: "/settings" },
   ];
 
   const path = usePathname();

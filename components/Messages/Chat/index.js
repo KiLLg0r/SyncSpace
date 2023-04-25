@@ -8,12 +8,22 @@ import useChatStore from "@store/useChatStore";
 
 import Image from "next/image";
 
+import { BsChevronLeft } from "react-icons/bs";
+import { motion } from "framer-motion";
+
 const Chat = () => {
   const name = useChatStore((state) => state.user);
+  const changeConversation = useChatStore((state) => state.updateConversation);
 
   return (
-    <div className={styles.chat}>
+    <motion.div
+      initial={{ opacity: 0, x: "17rem" }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: "17rem" }}
+      className={styles.chat}
+    >
       <div className={styles.chatInfo}>
+        <BsChevronLeft onClick={() => changeConversation(null, null, "")} />
         <div className={styles.img}>
           <Image
             src={useChatStore((state) => state.userImg)}
@@ -27,7 +37,7 @@ const Chat = () => {
       </div>
       <Messages />
       <Input />
-    </div>
+    </motion.div>
   );
 };
 

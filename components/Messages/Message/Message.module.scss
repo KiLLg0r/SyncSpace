@@ -2,19 +2,20 @@
   display: flex;
   gap: 0.25rem;
   margin-bottom: 0.75rem;
+  font-size: 0.75rem;
 
   .messageInfo {
     display: flex;
     flex-direction: column;
     color: var(--gray-light-500);
     font-weight: 300;
-    font-size: 0.75rem;
+    font-size: 0.5rem;
     align-items: flex-start;
 
     .img {
       position: relative;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
       border-radius: 50%;
       overflow: hidden;
     }
@@ -29,7 +30,7 @@
     p {
       background-color: var(--gray-dark-600);
       color: var(--accent);
-      padding: 0.625rem 1.25rem;
+      padding: 0.25rem 0.75rem;
       border-radius: 0px 0.625rem 0.625rem 0.625rem;
       max-width: max-content;
     }
