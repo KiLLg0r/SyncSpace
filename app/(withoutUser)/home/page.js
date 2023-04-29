@@ -1,8 +1,6 @@
 "use client";
 
 import styles from "./Home.module.scss";
-import Feature from "@components/Feature";
-import { BsFillBrightnessHighFill } from "react-icons/bs";
 import { motion } from "framer-motion";
 
 const Home = () => {
@@ -106,35 +104,6 @@ const Home = () => {
             <div className={styles.planet}></div>
           </div>
         </main>
-      </div>
-      <div className={styles.features}>
-        <div className={`${styles.rectangle} ${styles.rect1}`}></div>
-        <main className={styles.content}>
-          <motion.div
-            variants={featuresContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            className={`${styles.container} ${styles.featuresLayout}`}
-          >
-            <motion.div variants={featureItemLeft}>
-              <Feature title="Ceva" desc="Lorem Ipsum is simplyPageMaker including versions of Lorem Ipsum.">
-                <BsFillBrightnessHighFill />
-              </Feature>
-            </motion.div>
-            <motion.div variants={featureItemCenter}>
-              <Feature title="Ceva" desc="Lorem Ipsum is simplyPageMaker including versions of Lorem Ipsum.">
-                <BsFillBrightnessHighFill />
-              </Feature>
-            </motion.div>
-            <motion.div variants={featureItemRight}>
-              <Feature title="Ceva" desc="Lorem Ipsum is simplyPageMaker including versions of Lorem Ipsum.">
-                <BsFillBrightnessHighFill />
-              </Feature>
-            </motion.div>
-          </motion.div>
-        </main>
-        <div className={`${styles.rectangle} ${styles.rect2}`}></div>
       </div>
     </motion.div>
   );
