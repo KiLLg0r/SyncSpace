@@ -24,10 +24,10 @@
   
  ## ➤ Tech Stack
 
-Front-end: Next.js, HTML, SCSS
-Back-end: Node.js, Firebase
-Deployment: Vercel
-Code editor: Monaco Editor
-Collaborative coding: Yjs
-Authentication, storage and database: Firebase
-Animations: Framer-motion
+- Front-end: Next.js, HTML, SCSS
+- Back-end: Node.js, Firebase
+- Deployment: Vercel
+- Code editor: Monaco Editor
+- Collaborative coding: Yjs
+- Authentication, storage and database: Firebase
+- Animations: Framer-motion
