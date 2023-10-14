@@ -31,3 +31,6 @@
 - Collaborative coding: Yjs
 - Authentication, storage and database: Firebase
 - Animations: Framer-motion
+
+  ## ➤ Collaborators
+  Special thanks for Stângă George and Postolache Fabian for joining me in this journey and being part of the team that developed this idea.
